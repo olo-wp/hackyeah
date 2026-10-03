@@ -1,0 +1,64 @@
+[project]
+name = "routeable"
+version = "0.1.0"
+description = "RouteAble — Accessibility Data Intelligence Layer for Krakow"
+requires-python = ">=3.12"
+dependencies = [
+    "routeable-api",
+    "routeable-mcp",
+    "routeable-database",
+    "routeable-engine",
+    "routeable-model",
+    "routeable-provider-core",
+    "routeable-provider-krakow-open-data",
+    "routeable-provider-osm",
+    "routeable-provider-websites",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13.0",
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "respx>=0.21.1",
+    "ruff>=0.7.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["apps/api", "apps/mcp", "packages/*"]
+
+[tool.uv.sources]
+routeable-api = { workspace = true }
+routeable-database = { workspace = true }
+routeable-engine = { workspace = true }
+routeable-mcp = { workspace = true }
+routeable-model = { workspace = true }
+routeable-provider-core = { workspace = true }
+routeable-provider-krakow-open-data = { workspace = true }
+routeable-provider-osm = { workspace = true }
+routeable-provider-websites = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["apps/api/src", "apps/mcp/src", "packages/*/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "C4", "SIM", "RUF", "ASYNC", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = ["S"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["packages", "apps"]
+pythonpath = []
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]

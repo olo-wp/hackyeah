@@ -1,0 +1,20 @@
+[project]
+name = "routeable-provider-krakow-open-data"
+version = "0.1.0"
+description = "Krakow open data provider (curated snapshot until the live feed is wired in)"
+requires-python = ">=3.12"
+dependencies = [
+    "routeable-model",
+    "routeable-provider-core",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/routeable_provider_krakow"]
+
+[tool.uv.sources]
+routeable-model = { workspace = true }
+routeable-provider-core = { workspace = true }

@@ -1,8 +1,17 @@
-# Kraków bez barier — Technical Architecture
+# RouteAble — Technical Architecture
 
 ## 1. Cel dokumentu
 
-Ten dokument opisuje proponowaną architekturę techniczną MVP aplikacji **Kraków bez barier**.
+Ten dokument opisuje proponowaną architekturę techniczną MVP aplikacji **RouteAble**
+(„Kraków bez barier”).
+
+Stack:
+
+```text
+backend   Python 3.12 — FastAPI, Pydantic v2, httpx, psycopg 3
+frontend  TypeScript — Next.js, React, Tailwind CSS
+baza      PostgreSQL
+```
 
 System ma agregować informacje o dostępności miejsc z wielu źródeł, normalizować je do wspólnego modelu, wykrywać konflikty, oceniać wiarygodność danych i udostępniać je:
 
@@ -165,9 +174,9 @@ Przykład odpowiedzi:
 
 ```json
 {
-  "placeId": "osm:node:123456",
+  "place_id": "osm:node:123456",
   "features": {
-    "stepFreeEntrance": {
+    "step_free_entrance": {
       "value": true,
       "status": "confirmed",
       "confidence": "high"
@@ -177,7 +186,7 @@ Przykład odpowiedzi:
       "status": "confirmed",
       "confidence": "medium"
     },
-    "accessibleToilet": {
+    "accessible_toilet": {
       "value": null,
       "status": "unknown",
       "confidence": null
@@ -445,33 +454,34 @@ Wszystkie providery mapują swoje dane do tego modelu.
 
 ## 11.1 Place
 
-```typescript
-interface Place {
-  id: string;
+```python
+class PlaceCategory(StrEnum):
+    MUSEUM = "museum"
+    HOTEL = "hotel"
+    RESTAURANT = "restaurant"
+    ATTRACTION = "attraction"
+    EVENT_VENUE = "event_venue"
+    OTHER = "other"
 
-  name: string;
 
-  category:
-    | "museum"
-    | "hotel"
-    | "restaurant"
-    | "attraction"
-    | "event_venue"
-    | "other";
+class GeoLocation(BaseModel):
+    lat: float
+    lng: float
 
-  address?: string;
 
-  location: {
-    lat: number;
-    lng: number;
-  };
+class ExternalIds(BaseModel):
+    osm: str | None = None
+    city_dataset: str | None = None
+    website: str | None = None
 
-  externalIds: {
-    osm?: string;
-    cityDataset?: string;
-    website?: string;
-  };
-}
+
+class Place(BaseModel):
+    id: str
+    name: str
+    category: PlaceCategory = PlaceCategory.OTHER
+    address: str | None = None
+    location: GeoLocation
+    external_ids: ExternalIds = Field(default_factory=ExternalIds)
 ```
 
 ---
@@ -480,119 +490,114 @@ interface Place {
 
 Każda pojedyncza informacja powinna być osobnym obiektem.
 
-```typescript
-interface AccessibilityFeature<T> {
-  key: string;
+```python
+T = TypeVar("T")
 
-  value: T | null;
 
-  status:
-    | "confirmed"
-    | "unknown"
-    | "conflicting"
-    | "stale";
-
-  confidence:
-    | "high"
-    | "medium"
-    | "low"
-    | null;
-
-  evidence: Evidence[];
-}
+class AccessibilityFeature(BaseModel, Generic[T]):
+    key: FeatureKey
+    value: T | None = None
+    status: FeatureStatus = FeatureStatus.UNKNOWN
+    confidence: ConfidenceLevel | None = None
+    evidence: list[Evidence] = Field(default_factory=list)
+    conflict_reason: str | None = None
 ```
 
 ---
 
 # 13. Evidence
 
-```typescript
-interface Evidence {
-  id: string;
+```python
+class VerificationStatus(StrEnum):
+    VERIFIED = "verified"
+    UNVERIFIED = "unverified"
+    SELF_REPORTED = "self_reported"
+    AUTOMATICALLY_EXTRACTED = "automatically_extracted"
 
-  source: DataSource;
 
-  value: unknown;
-
-  retrievedAt: string;
-
-  observedAt?: string;
-
-  verificationStatus:
-    | "verified"
-    | "unverified"
-    | "self_reported"
-    | "automatically_extracted";
-
-  rawData?: unknown;
-}
+class Evidence(BaseModel):
+    id: str
+    place_id: str
+    feature_key: FeatureKey
+    source: DataSource
+    value: Any = None
+    retrieved_at: datetime
+    observed_at: datetime | None = None
+    verification_status: VerificationStatus
+    raw_data: Any | None = None
 ```
 
 ---
 
 # 14. Data Source
 
-```typescript
-interface DataSource {
-  id: string;
+```python
+class SourceType(StrEnum):
+    OPENSTREETMAP = "openstreetmap"
+    CITY_OPEN_DATA = "city_open_data"
+    OFFICIAL_WEBSITE = "official_website"
+    USER_REPORT = "user_report"
+    PARTNER_API = "partner_api"
+    DEMO_DATA = "demo_data"
 
-  type:
-    | "openstreetmap"
-    | "city_open_data"
-    | "official_website"
-    | "user_report"
-    | "partner_api";
 
-  name: string;
-
-  url?: string;
-
-  license?: string;
-}
+class DataSource(BaseModel):
+    id: str
+    type: SourceType
+    name: str
+    url: str | None = None
+    license: str | None = None
 ```
 
 ---
 
 # 15. Accessibility profile
 
-```typescript
-interface AccessibilityProfile {
-  placeId: string;
+```python
+class EntranceFeatures(BaseModel):
+    step_free: AccessibilityFeature[bool]
+    steps: AccessibilityFeature[int]
+    ramp: AccessibilityFeature[bool]
+    threshold_cm: AccessibilityFeature[float]
+    door_width_cm: AccessibilityFeature[float]
 
-  entrance: {
-    stepFree: AccessibilityFeature<boolean>;
-    steps: AccessibilityFeature<number>;
-    ramp: AccessibilityFeature<boolean>;
-    thresholdCm: AccessibilityFeature<number>;
-    doorWidthCm: AccessibilityFeature<number>;
-  };
 
-  interior: {
-    elevator: AccessibilityFeature<boolean>;
-    stairs: AccessibilityFeature<boolean>;
-  };
+class InteriorFeatures(BaseModel):
+    elevator: AccessibilityFeature[bool]
+    stairs: AccessibilityFeature[bool]
 
-  facilities: {
-    accessibleToilet: AccessibilityFeature<boolean>;
-    seating: AccessibilityFeature<boolean>;
-  };
 
-  surroundings: {
-    surface: AccessibilityFeature<
-      | "asphalt"
-      | "concrete"
-      | "paving_stones"
-      | "cobblestone"
-      | "gravel"
-      | "unpaved"
-      | "unknown"
-    >;
+class FacilityFeatures(BaseModel):
+    accessible_toilet: AccessibilityFeature[bool]
+    seating: AccessibilityFeature[bool]
 
-    curb: AccessibilityFeature<boolean>;
 
-    accessibleParking: AccessibilityFeature<boolean>;
-  };
-}
+class SurroundingFeatures(BaseModel):
+    surface: AccessibilityFeature[SurfaceValue]
+    curb: AccessibilityFeature[bool]
+    accessible_parking: AccessibilityFeature[bool]
+
+
+class AccessibilityProfile(BaseModel):
+    place_id: str
+    entrance: EntranceFeatures
+    interior: InteriorFeatures
+    facilities: FacilityFeatures
+    surroundings: SurroundingFeatures
+    metadata: ProfileMetadata = Field(default_factory=ProfileMetadata)
+```
+
+`SurfaceValue` jest osobnym enumem:
+
+```python
+class SurfaceValue(StrEnum):
+    ASPHALT = "asphalt"
+    CONCRETE = "concrete"
+    PAVING_STONES = "paving_stones"
+    COBBLESTONE = "cobblestone"
+    GRAVEL = "gravel"
+    UNPAVED = "unpaved"
+    UNKNOWN = "unknown"
 ```
 
 ---
@@ -601,12 +606,12 @@ interface AccessibilityProfile {
 
 System powinien mieć cztery podstawowe statusy.
 
-```typescript
-type FeatureStatus =
-  | "confirmed"
-  | "unknown"
-  | "conflicting"
-  | "stale";
+```python
+class FeatureStatus(StrEnum):
+    CONFIRMED = "confirmed"
+    UNKNOWN = "unknown"
+    CONFLICTING = "conflicting"
+    STALE = "stale"
 ```
 
 ### `confirmed`
@@ -643,14 +648,15 @@ LOW
 
 ## 17.1 Przykładowe bazowe wartości źródeł
 
-```typescript
-const SOURCE_CONFIDENCE = {
-  city_open_data: 0.9,
-  official_website: 0.9,
-  partner_api: 0.9,
-  openstreetmap: 0.7,
-  user_report: 0.4
-};
+```python
+SOURCE_CONFIDENCE: dict[SourceType, float] = {
+    SourceType.CITY_OPEN_DATA: 0.9,
+    SourceType.OFFICIAL_WEBSITE: 0.9,
+    SourceType.PARTNER_API: 0.9,
+    SourceType.OPENSTREETMAP: 0.7,
+    SourceType.USER_REPORT: 0.4,
+    SourceType.DEMO_DATA: 0.3,
+}
 ```
 
 Nie powinny być traktowane jako uniwersalne wartości produkcyjne.
@@ -726,33 +732,28 @@ status = conflicting
 
 ## 18.1 Prosty algorytm
 
-```typescript
-function resolveFeature(evidence: Evidence[]) {
-  if (evidence.length === 0) {
-    return {
-      value: null,
-      status: "unknown"
-    };
-  }
+```python
+def resolve_feature(key: FeatureKey, evidence: list[Evidence]) -> AccessibilityFeature[Any]:
+    if not evidence:
+        return AccessibilityFeature(key=key, value=None, status=FeatureStatus.UNKNOWN)
 
-  const values = evidence.map(item => item.value);
+    distinct = {json.dumps(item.value, sort_keys=True, default=str): item.value
+                for item in evidence}
 
-  const uniqueValues = new Set(values);
+    if len(distinct) > 1:
+        return AccessibilityFeature(
+            key=key,
+            value=None,
+            status=FeatureStatus.CONFLICTING,
+            evidence=evidence,
+        )
 
-  if (uniqueValues.size > 1) {
-    return {
-      value: null,
-      status: "conflicting",
-      evidence
-    };
-  }
-
-  return {
-    value: values[0],
-    status: "confirmed",
-    evidence
-  };
-}
+    return AccessibilityFeature(
+        key=key,
+        value=next(iter(distinct.values())),
+        status=FeatureStatus.CONFIRMED,
+        evidence=evidence,
+    )
 ```
 
 W produkcji należy uwzględnić bardziej złożone zależności pomiędzy cechami.
@@ -795,23 +796,26 @@ Przykład:
 
 Każde źródło danych powinno implementować wspólny interfejs.
 
-```typescript
-interface AccessibilityProvider {
-  name: string;
+```python
+@runtime_checkable
+class AccessibilityProvider(Protocol):
+    @property
+    def name(self) -> str: ...
 
-  searchPlaces(
-    query: string,
-    location?: Location
-  ): Promise<ExternalPlace[]>;
+    @property
+    def source(self) -> DataSource: ...
 
-  getPlace(
-    externalId: string
-  ): Promise<ExternalPlace | null>;
+    async def search_places(
+        self, query: str, options: SearchOptions | None = None
+    ) -> list[ExternalPlace]: ...
 
-  getAccessibilityData(
-    place: ExternalPlace
-  ): Promise<RawAccessibilityEvidence[]>;
-}
+    async def get_place(self, external_id: str) -> ExternalPlace | None: ...
+
+    async def get_accessibility_data(
+        self, place: ExternalPlace
+    ) -> list[RawAccessibilityEvidence]: ...
+
+    async def aclose(self) -> None: ...
 ```
 
 ---
@@ -835,16 +839,16 @@ Provider Provider      Provider
 
 # 22. Provider Registry
 
-```typescript
-class ProviderRegistry {
-  constructor(
-    private providers: AccessibilityProvider[]
-  ) {}
+```python
+class ProviderRegistry:
+    def __init__(self, providers: list[AccessibilityProvider] | None = None) -> None:
+        self._by_name = {provider.name: provider for provider in providers or []}
 
-  getProviders() {
-    return this.providers;
-  }
-}
+    def get(self, name: str) -> AccessibilityProvider | None:
+        return self._by_name.get(name)
+
+    def get_providers(self) -> list[AccessibilityProvider]:
+        return list(self._by_name.values())
 ```
 
 Dzięki temu można dodać nowe źródło bez zmiany logiki agregacji.
@@ -1048,6 +1052,8 @@ Na MVP:
 ```text
 PostgreSQL
 ```
+
+Dostęp z Pythona przez `psycopg` 3 (sterownik async) — patrz `packages/database`.
 
 Opcjonalnie:
 
@@ -1292,23 +1298,14 @@ Wartości powinny być konfigurowalne per provider.
 
 # 38. Provider sync
 
-```typescript
-interface ProviderSync {
-  provider: string;
-
-  startedAt: string;
-
-  finishedAt?: string;
-
-  status:
-    | "running"
-    | "success"
-    | "failed";
-
-  processedItems: number;
-
-  error?: string;
-}
+```python
+class ProviderSync(BaseModel):
+    provider: str
+    started_at: datetime
+    finished_at: datetime | None = None
+    status: SyncStatus
+    processed_items: int = 0
+    error: str | None = None
 ```
 
 Pozwala pokazać:
@@ -1438,19 +1435,19 @@ PLACE NOT ACCESSIBLE
 
 Przykładowy model:
 
-```typescript
-interface PreferenceEvaluation {
-  key: string;
+```python
+class PreferenceResult(StrEnum):
+    MEETS_PREFERENCE = "meets_preference"
+    DOES_NOT_MEET_PREFERENCE = "does_not_meet_preference"
+    UNKNOWN = "unknown"
+    NEEDS_VERIFICATION = "needs_verification"
 
-  preference: unknown;
 
-  observedValue: unknown;
-
-  result:
-    | "meets_preference"
-    | "does_not_meet_preference"
-    | "unknown";
-}
+class PreferenceEvaluation(BaseModel):
+    key: FeatureKey
+    preference: Any = None
+    observed_value: Any = None
+    result: PreferenceResult
 ```
 
 ---
@@ -1490,25 +1487,26 @@ interface PreferenceEvaluation {
     }
   },
 
-  "preferenceEvaluation": [
+  "preference_evaluation": [
     {
       "key": "step_free_entrance",
       "preference": true,
-      "observedValue": true,
+      "observed_value": true,
       "result": "meets_preference"
     },
 
     {
-      "key": "min_door_width_cm",
+      "key": "door_width_cm",
       "preference": 80,
-      "observedValue": null,
+      "observed_value": null,
       "result": "unknown"
     }
   ],
 
   "metadata": {
-    "sources": 3,
-    "lastUpdated": "2026-10-03T11:00:00Z"
+    "source_count": 3,
+    "evidence_count": 11,
+    "last_updated": "2026-10-03T11:00:00Z"
   }
 }
 ```
@@ -1517,45 +1515,62 @@ interface PreferenceEvaluation {
 
 # 45. Repository structure
 
-Proponowana struktura monorepo:
+Monorepo polyglot: backend w Pythonie (workspace `uv`), frontend w TypeScripcie
+(workspace `npm`).
 
 ```text
-krakow-bez-barier/
+RouteAble/
 
 ├── apps/
 │
-│   ├── web/
-│   │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── package.json
+│   ├── api/                                  # FastAPI — REST API
+│   │   ├── src/routeable_api/
+│   │   │   ├── routers/
+│   │   │   ├── config.py
+│   │   │   ├── container.py
+│   │   │   ├── dependencies.py
+│   │   │   └── main.py
+│   │   ├── Dockerfile
+│   │   └── pyproject.toml
 │   │
-│   ├── api/
-│   │   ├── src/
-│   │   └── package.json
+│   ├── mcp/                                  # MCP server dla agentów AI
+│   │   ├── src/routeable_mcp/
+│   │   │   ├── server.py
+│   │   │   └── __main__.py
+│   │   ├── Dockerfile
+│   │   └── pyproject.toml
 │   │
-│   └── mcp/
+│   └── web/                                  # Next.js + TypeScript
 │       ├── src/
-│       │   ├── tools/
-│       │   ├── schemas/
-│       │   └── server.ts
+│       │   ├── app/
+│       │   ├── components/
+│       │   └── lib/
+│       ├── Dockerfile
 │       └── package.json
 │
 ├── packages/
 │
-│   ├── accessibility-model/
+│   ├── accessibility-model/                  # routeable_model
+│   │   ├── src/routeable_model/
+│   │   └── pyproject.toml
 │   │
-│   ├── accessibility-engine/
+│   ├── accessibility-engine/                 # routeable_engine
+│   │   ├── src/routeable_engine/
+│   │   ├── tests/
+│   │   └── pyproject.toml
 │   │
-│   ├── provider-core/
+│   ├── provider-core/                        # routeable_provider_core
 │   │
-│   ├── provider-osm/
+│   ├── provider-osm/                         # routeable_provider_osm
 │   │
-│   ├── provider-krakow-open-data/
+│   ├── provider-krakow-open-data/            # routeable_provider_krakow
 │   │
-│   ├── provider-websites/
+│   ├── provider-websites/                    # routeable_provider_websites
 │   │
-│   └── database/
+│   └── database/                             # routeable_database
+│       ├── src/routeable_database/
+│       │   └── schema/001_init.sql
+│       └── pyproject.toml
 │
 ├── docs/
 │   ├── MVP_PLAN.md
@@ -1563,24 +1578,42 @@ krakow-bez-barier/
 │
 ├── docker-compose.yml
 │
-├── package.json
+├── pyproject.toml                            # workspace uv (backend)
+│
+├── package.json                              # workspace npm (frontend)
+│
+├── Makefile
 │
 └── README.md
 ```
 
+Każdy pakiet Pythona ma układ `src/<moduł>` i własny `pyproject.toml`, dzięki czemu
+zależności między warstwami są jawne i wymuszane przez narzędzia.
+
 ---
 
 # 46. Package responsibilities
+
+| Katalog | Moduł Pythona | Odpowiedzialność |
+| --- | --- | --- |
+| `accessibility-model` | `routeable_model` | wspólne modele Pydantic, enumy, schematy |
+| `accessibility-engine` | `routeable_engine` | normalizacja, conflict detection, confidence, preference evaluation, `AccessibilityService` |
+| `provider-core` | `routeable_provider_core` | protokół providera, rejestr, klient HTTP, helpery geo |
+| `provider-osm` | `routeable_provider_osm` | OpenStreetMap: Nominatim + Overpass, mapowanie tagów |
+| `provider-krakow-open-data` | `routeable_provider_krakow` | dane miejskie Krakowa |
+| `provider-websites` | `routeable_provider_websites` | pobieranie i ekstrakcja ze stron z allowlisty |
+| `database` | `routeable_database` | schemat SQL, migracje, repozytoria psycopg |
+
+---
 
 ## `accessibility-model`
 
 Wspólne:
 
 ```text
-types
-interfaces
-schemas
-enums
+modele Pydantic
+enumy
+schematy
 ```
 
 ---
@@ -1603,7 +1636,7 @@ preference evaluation
 Definicje:
 
 ```text
-Provider interface
+Provider protocol
 Provider registry
 shared provider utilities
 ```
@@ -1651,17 +1684,21 @@ repositories
 ```text
 AccessibilityService
 
-├── getPlaceAccessibility()
+├── search_places()
 │
-├── collectEvidence()
+├── get_place_accessibility()
 │
-├── normalizeEvidence()
+├── get_evidence()
 │
-├── resolveFeatures()
+├── _collect_evidence()
 │
-├── calculateConfidence()
+├── build_accessibility_profile()
 │
-└── evaluatePreferences()
+├── resolve_feature()
+│
+├── calculate_confidence()
+│
+└── evaluate_preferences()
 ```
 
 ---
@@ -1889,8 +1926,10 @@ Alternatywnie całość można uruchomić przez Docker Compose.
 
 # 54. Local development
 
+Całość w kontenerach:
+
 ```text
-docker compose up
+docker compose up --build
 ```
 
 Usługi:
@@ -1901,6 +1940,19 @@ api
 mcp
 postgres
 ```
+
+Lokalnie, bez kontenerów:
+
+```bash
+uv sync                 # backend — wszystkie pakiety Pythona
+npm install             # frontend
+
+uv run routeable-api    # REST API
+uv run routeable-mcp    # MCP server
+npm run dev             # Next.js
+```
+
+Bez `DATABASE_URL` API startuje na magazynie w pamięci — wystarczy do dema.
 
 Opcjonalnie:
 
@@ -1919,15 +1971,26 @@ Przykład:
 ```env
 DATABASE_URL=
 
-OSM_OVERPASS_URL=
 NOMINATIM_URL=
+OSM_OVERPASS_URL=
 
-MCP_PORT=3002
 API_PORT=3001
+WEB_PORT=3000
+
+MCP_TRANSPORT=stdio
+FASTMCP_HOST=127.0.0.1
+FASTMCP_PORT=3002
+
+ROUTEABLE_API_URL=http://localhost:3001
 
 USER_AGENT=
 
 WEB_PROVIDER_TIMEOUT_MS=5000
+PROVIDER_CACHE_TTL_HOURS=24
+STALE_AFTER_DAYS=180
+
+CORS_ORIGINS=["http://localhost:3000"]
+RATE_LIMIT=120/minute
 ```
 
 ---

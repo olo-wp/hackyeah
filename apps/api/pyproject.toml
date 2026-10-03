@@ -1,0 +1,37 @@
+[project]
+name = "routeable-api"
+version = "0.1.0"
+description = "RouteAble REST API"
+requires-python = ">=3.12"
+dependencies = [
+    "routeable-database",
+    "routeable-engine",
+    "routeable-model",
+    "routeable-provider-core",
+    "routeable-provider-krakow-open-data",
+    "routeable-provider-osm",
+    "routeable-provider-websites",
+    "fastapi>=0.115.4",
+    "pydantic-settings>=2.6.1",
+    "slowapi>=0.1.9",
+    "uvicorn[standard]>=0.32.0",
+]
+
+[project.scripts]
+routeable-api = "routeable_api.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/routeable_api"]
+
+[tool.uv.sources]
+routeable-database = { workspace = true }
+routeable-engine = { workspace = true }
+routeable-model = { workspace = true }
+routeable-provider-core = { workspace = true }
+routeable-provider-krakow-open-data = { workspace = true }
+routeable-provider-osm = { workspace = true }
+routeable-provider-websites = { workspace = true }

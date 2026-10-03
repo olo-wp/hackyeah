@@ -1,0 +1,26 @@
+{
+  "_comment": "Only domains listed here are ever fetched. User input never becomes a URL - see ARCHITECTURE sections 27 and 50 (SSRF).",
+  "sites": [
+    {
+      "domain": "mnk.pl",
+      "allowed": true,
+      "refresh_interval_hours": 24,
+      "place_ids": ["krakow:mnk-gmach-glowny"],
+      "accessibility_pages": ["/dla-zwiedzajacych/dostepnosc", "/deklaracja-dostepnosci"]
+    },
+    {
+      "domain": "mariacki.com",
+      "allowed": true,
+      "refresh_interval_hours": 24,
+      "place_ids": ["krakow:bazylika-mariacka"],
+      "accessibility_pages": ["/dostepnosc", "/deklaracja-dostepnosci"]
+    },
+    {
+      "domain": "podziemiarynku.com",
+      "allowed": false,
+      "refresh_interval_hours": 24,
+      "place_ids": ["krakow:podziemia-rynku"],
+      "accessibility_pages": ["/dostepnosc"]
+    }
+  ]
+}

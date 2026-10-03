@@ -1,0 +1,24 @@
+[project]
+name = "routeable-database"
+version = "0.1.0"
+description = "PostgreSQL schema, migrations and evidence repository"
+requires-python = ">=3.12"
+dependencies = [
+    "routeable-engine",
+    "routeable-model",
+    "psycopg[binary,pool]>=3.2.3",
+]
+
+[project.scripts]
+routeable-migrate = "routeable_database.migrate:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/routeable_database"]
+
+[tool.uv.sources]
+routeable-engine = { workspace = true }
+routeable-model = { workspace = true }

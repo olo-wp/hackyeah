@@ -1,0 +1,58 @@
+{
+  "_comment": "DEMO DATA / DANE PRZYKLADOWE - hand-curated snapshot used until the live Otwarte Dane Miasta Krakowa / MSIP feed is wired in. Values are intentionally incomplete and partially contradictory so the conflict and unknown paths can be demonstrated.",
+  "dataset_name": "Krakow Open Data (demo snapshot)",
+  "retrieved_at": "2026-09-20T09:00:00Z",
+  "entries": [
+    {
+      "external_id": "mnk-gmach-glowny",
+      "name": "Muzeum Narodowe w Krakowie - Gmach Glowny",
+      "category": "museum",
+      "address": "al. 3 Maja 1, 30-062 Krakow",
+      "location": { "lat": 50.0617, "lng": 19.9237 },
+      "website_url": "https://mnk.pl",
+      "osm_external_id": null,
+      "observed_at": "2026-09-18T00:00:00Z",
+      "features": {
+        "step_free_entrance": true,
+        "entrance_steps": 0,
+        "ramp": true,
+        "elevator": true,
+        "accessible_toilet": true,
+        "accessible_parking": true,
+        "surface": "paving_stones"
+      }
+    },
+    {
+      "external_id": "bazylika-mariacka",
+      "name": "Bazylika Mariacka",
+      "category": "attraction",
+      "address": "plac Mariacki 5, 31-042 Krakow",
+      "location": { "lat": 50.0617, "lng": 19.9397 },
+      "website_url": "https://mariacki.com",
+      "osm_external_id": null,
+      "observed_at": "2026-08-02T00:00:00Z",
+      "features": {
+        "entrance_steps": 3,
+        "ramp": false,
+        "elevator": false,
+        "surface": "cobblestone",
+        "curb": true
+      }
+    },
+    {
+      "external_id": "podziemia-rynku",
+      "name": "Muzeum Podziemia Rynku",
+      "category": "museum",
+      "address": "Rynek Glowny 1, 31-042 Krakow",
+      "location": { "lat": 50.0619, "lng": 19.9372 },
+      "website_url": "https://podziemiarynku.com",
+      "osm_external_id": null,
+      "observed_at": "2026-07-11T00:00:00Z",
+      "features": {
+        "step_free_entrance": true,
+        "elevator": true,
+        "surface": "cobblestone"
+      }
+    }
+  ]
+}

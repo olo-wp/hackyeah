@@ -1,4 +1,4 @@
-# Kraków bez barier — MVP Plan
+# RouteAble — MVP Plan
 
 ## 1. Cel MVP
 
@@ -1285,7 +1285,7 @@ Dzięki MCP ta sama infrastruktura może być bezpośrednio wykorzystywana przez
 
 ## 32. Pitch
 
-> **Kraków bez barier to platforma agregująca i weryfikująca informacje o dostępności miejsc. Zamiast mówić użytkownikowi, że miejsce jest „dostępne” lub „niedostępne”, pokazuje konkretne bariery, udogodnienia, źródła informacji i poziom ich wiarygodności, pozwalając użytkownikowi samodzielnie ocenić, czy dane miejsce odpowiada jego potrzebom.**
+> **RouteAble to platforma agregująca i weryfikująca informacje o dostępności miejsc. Zamiast mówić użytkownikowi, że miejsce jest „dostępne” lub „niedostępne”, pokazuje konkretne bariery, udogodnienia, źródła informacji i poziom ich wiarygodności, pozwalając użytkownikowi samodzielnie ocenić, czy dane miejsce odpowiada jego potrzebom.**
 
 ---
 

@@ -1,0 +1,20 @@
+[project]
+name = "routeable-engine"
+version = "0.1.0"
+description = "Normalization, conflict detection, confidence and preference evaluation"
+requires-python = ">=3.12"
+dependencies = [
+    "routeable-model",
+    "routeable-provider-core",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/routeable_engine"]
+
+[tool.uv.sources]
+routeable-model = { workspace = true }
+routeable-provider-core = { workspace = true }

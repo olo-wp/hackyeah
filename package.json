@@ -1,0 +1,14 @@
+{
+  "name": "routeable-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "npm workspace for the RouteAble web app. The backend lives in Python (uv workspace).",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @routeable/web",
+    "build": "npm run build --workspace @routeable/web",
+    "lint": "npm run lint --workspace @routeable/web"
+  }
+}

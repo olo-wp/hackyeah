@@ -1,0 +1,19 @@
+[project]
+name = "routeable-provider-core"
+version = "0.1.0"
+description = "Provider contract, registry and shared provider utilities"
+requires-python = ">=3.12"
+dependencies = [
+    "routeable-model",
+    "httpx>=0.27.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/routeable_provider_core"]
+
+[tool.uv.sources]
+routeable-model = { workspace = true }

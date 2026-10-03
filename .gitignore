@@ -218,3 +218,19 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Node / Next.js (apps/web) ----------------------------------------------
+node_modules/
+.next/
+out/
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+yarn-error.log*
+.eslintcache
+
+# The Python template above ignores every `lib/` and `dist/` directory;
+# the frontend source tree must stay tracked.
+!apps/web/src/lib/
+!apps/web/src/lib/**
