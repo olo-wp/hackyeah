@@ -13,8 +13,4 @@
     <orderEntry type="module" module-name="routeable-provider-core" exported="" />
     <orderEntry type="module" module-name="routeable-provider-osm" exported="" />
   </component>
-  <component name="PackageRequirementsSettings" />
-  <component name="PyDocumentationSettings" />
-  <component name="ReSTService" />
-  <component name="TestRunnerService" />
 </module>
