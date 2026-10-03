@@ -1,13 +1,14 @@
 """Official website provider."""
 
-from .extraction import extract_accessibility_evidence, html_to_text
+from .extraction import html_to_text
 from .provider import WEBSITE_PROVIDER_NAME, Allowlist, AllowlistedSite, WebsiteProvider
+from .search import GoogleSearchProvider
 
 __all__ = [
     "WEBSITE_PROVIDER_NAME",
     "Allowlist",
     "AllowlistedSite",
+    "GoogleSearchProvider",
     "WebsiteProvider",
-    "extract_accessibility_evidence",
     "html_to_text",
 ]

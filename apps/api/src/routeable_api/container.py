@@ -4,12 +4,13 @@ import logging
 from dataclasses import dataclass
 
 from psycopg_pool import AsyncConnectionPool
+
 from routeable_database import PostgresEvidenceStore, create_pool
 from routeable_engine import AccessibilityService, EvidenceStore, InMemoryEvidenceStore
-from routeable_provider_core import ProviderRegistry
+from routeable_provider_core import GeminiAccessibilityClassifier, ProviderRegistry
 from routeable_provider_krakow import KrakowOpenDataProvider
 from routeable_provider_osm import OsmProvider
-from routeable_provider_websites import WebsiteProvider
+from routeable_provider_websites import GoogleSearchProvider, WebsiteProvider
 
 from .config import Settings
 
@@ -29,6 +30,13 @@ class Container:
 
 
 def build_registry(settings: Settings) -> ProviderRegistry:
+    classifier = GeminiAccessibilityClassifier(
+        api_key=settings.gemini_api_key.get_secret_value() if settings.gemini_api_key else None,
+        model=settings.gemini_model,
+        timeout_s=settings.gemini_timeout_s,
+        max_input_chars=settings.gemini_max_input_chars,
+        fallback_model=settings.gemini_fallback_model,
+    )
     return ProviderRegistry(
         [
             OsmProvider(
@@ -36,12 +44,15 @@ def build_registry(settings: Settings) -> ProviderRegistry:
                 overpass_url=settings.osm_overpass_url,
                 user_agent=settings.user_agent,
                 timeout_s=settings.provider_timeout_s,
+                classifier=classifier,
             ),
             KrakowOpenDataProvider(),
             WebsiteProvider(
                 user_agent=settings.user_agent,
                 timeout_s=settings.provider_timeout_s,
+                classifier=classifier,
             ),
+            GoogleSearchProvider(classifier),
         ]
     )
 

@@ -1,5 +1,6 @@
 """Environment-driven settings."""
 
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +17,11 @@ class Settings(BaseSettings):
     web_provider_timeout_ms: int = 5000
     provider_cache_ttl_hours: int = 24
     stale_after_days: int = 180
+    gemini_api_key: SecretStr | None = None
+    gemini_model: str = "gemini-3.5-flash-lite"
+    gemini_fallback_model: str | None = "gemini-3.5-flash-lite"
+    gemini_timeout_s: float = Field(default=60.0, gt=0)
+    gemini_max_input_chars: int = Field(default=60000, gt=0)
 
     cors_origins: list[str] = ["http://localhost:3000"]
     rate_limit: str = "120/minute"

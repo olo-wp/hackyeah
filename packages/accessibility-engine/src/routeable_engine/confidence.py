@@ -12,6 +12,7 @@ SOURCE_CONFIDENCE: dict[SourceType, float] = {
     SourceType.OPENSTREETMAP: 0.7,
     SourceType.USER_REPORT: 0.4,
     SourceType.DEMO_DATA: 0.3,
+    SourceType.GOOGLE_SEARCH: 0.5,
 }
 
 HIGH_THRESHOLD = 0.8

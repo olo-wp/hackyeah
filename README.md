@@ -167,9 +167,47 @@ co REST API.
 | `osm` | OpenStreetMap (Nominatim + Overpass) | na żywo |
 | `krakow` | Otwarte Dane Miasta Krakowa | snapshot demonstracyjny |
 | `website` | Oficjalne strony obiektów | tylko domeny z allowlisty |
+| `google_search` | Wyszukiwanie Google przez Gemini | informacje o dostępności każdego miejsca, ze źródłami |
 
 Website Provider nigdy nie pobiera adresu podanego przez użytkownika — URL powstaje
 wyłącznie z konfiguracji allowlisty (ochrona przed SSRF).
+
+### Klasyfikacja AI i wyszukiwanie Google
+
+Ustaw `GEMINI_API_KEY` w `.env` (klucz z Google AI Studio). `GEMINI_MODEL` wybiera
+model; domyślnie `gemini-3.5-flash-lite`. `GEMINI_TIMEOUT_S=60` określa timeout pojedynczego
+wywołania modelu, a `GEMINI_MAX_INPUT_CHARS=60000` ogranicza tekst do klasyfikacji.
+Compose przekazuje te ustawienia do API i MCP. Klucz pozostaje po stronie backendu.
+
+Jeżeli wybrany model odpowiada `404`, API przechodzi na `GEMINI_FALLBACK_MODEL`
+(domyślnie `gemini-3.5-flash-lite`) i zapamiętuje zmianę do restartu procesu.
+Pusta wartość `GEMINI_FALLBACK_MODEL=` wyłącza to zachowanie. Nazwę modelu można
+podać jako `gemini-3.5-flash-lite` albo `models/gemini-3.5-flash-lite`.
+Przy błędach `400`, `403` i `429` API zachowuje błąd Google i nie zmienia modelu.
+Dowody zawierają nazwę modelu rzeczywiście użytego do klasyfikacji i wyszukiwania.
+
+Gemini klasyfikuje surowe tagi OSM i tekst deklaracji dostępności. Nie ma reguł
+regex ani sztywnego mapowania tagów na fakty o dostępności. Miejski snapshot zawiera
+już ustrukturyzowane fakty i jest odczytywany bez ponownej klasyfikacji.
+
+Niezależny provider `google_search` bada każde miejsce według nazwy, adresu i
+współrzędnych, również gdy OSM nie zawiera informacji o dostępności. Najpierw
+Gemini używa narzędzia Google Search; następne wywołanie klasyfikuje wyłącznie
+fragmenty powiązane ze źródłami przez `groundingSupports`. Rozdzielenie tych etapów
+umożliwia użycie modeli obsługujących wyszukiwanie i JSON w osobnych wywołaniach.
+W dowodach zapisujemy URL, fragment wspierający fakt, nazwę modelu oraz metadane
+groundingu (w tym `searchEntryPoint` do prezentacji sugestii Google przez klienta).
+Fakty AI mają status `automatically_extracted`, nie `verified`.
+
+Brak informacji pozostaje `unknown`, a sprzeczne obserwacje trafiają do silnika
+konfliktów. Niepoprawne wartości, wymyślone URL-e i cytaty nieobecne w dokumencie
+są odrzucane. Brak klucza, błąd modelu lub odpowiedź bez wykonanego Google Search
+pojawiają się jako `failed` w `provider_status`; nie ma powrotu do regexów.
+Wyniki są buforowane według `PROVIDER_CACHE_TTL_HOURS` (domyślnie 24 godziny).
+Wcześniej zebrane dane OSM/WWW mogą pozostać w cache do jego wygaśnięcia.
+
+Dokumentacja integracji: [Google Search grounding](https://ai.google.dev/gemini-api/docs/generate-content/google-search)
+i [structured outputs](https://ai.google.dev/gemini-api/docs/generate-content/structured-output).
 
 ## Dokumentacja
 

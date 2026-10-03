@@ -10,6 +10,11 @@ services:
       OSM_OVERPASS_URL: ${OSM_OVERPASS_URL}
       USER_AGENT: ${USER_AGENT}
       WEB_PROVIDER_TIMEOUT_MS: ${WEB_PROVIDER_TIMEOUT_MS:-35000}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL-gemini-3.5-flash-lite}
+      GEMINI_TIMEOUT_S: ${GEMINI_TIMEOUT_S:-60}
+      GEMINI_MAX_INPUT_CHARS: ${GEMINI_MAX_INPUT_CHARS:-60000}
       CORS_ORIGINS: '["http://localhost:3000"]'
     ports:
       - "3001:3001"
@@ -29,6 +34,11 @@ services:
       MCP_TRANSPORT: http
       FASTMCP_HOST: 0.0.0.0
       FASTMCP_PORT: 3002
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL-gemini-3.5-flash-lite}
+      GEMINI_TIMEOUT_S: ${GEMINI_TIMEOUT_S:-60}
+      GEMINI_MAX_INPUT_CHARS: ${GEMINI_MAX_INPUT_CHARS:-60000}
     ports:
       - "3002:3002"
     depends_on:

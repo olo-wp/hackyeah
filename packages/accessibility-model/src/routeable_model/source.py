@@ -12,6 +12,7 @@ class SourceType(StrEnum):
     USER_REPORT = "user_report"
     PARTNER_API = "partner_api"
     DEMO_DATA = "demo_data"
+    GOOGLE_SEARCH = "google_search"
 
 
 class DataSource(BaseModel):
