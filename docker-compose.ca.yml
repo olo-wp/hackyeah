@@ -1,0 +1,17 @@
+services:
+  api:
+    build:
+      secrets:
+        - routeable_ca
+  mcp:
+    build:
+      secrets:
+        - routeable_ca
+  web:
+    build:
+      secrets:
+        - routeable_ca
+
+secrets:
+  routeable_ca:
+    file: ${ROUTEABLE_CA_CERT:?Set ROUTEABLE_CA_CERT to a PEM-encoded root CA file}

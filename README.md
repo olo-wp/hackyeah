@@ -88,6 +88,19 @@ Albo całość w kontenerach:
 docker compose up --build
 ```
 
+Jeśli sieć używa firmowego CA i build kontenerów kończy się błędem
+`invalid peer certificate: UnknownIssuer`, wyeksportuj z Windows zaufany
+certyfikat główny jako Base-64 X.509 (PEM) poza repozytorium. Następnie
+w PowerShell uruchom:
+
+```powershell
+$env:ROUTEABLE_CA_CERT = "C:\certs\company-root.crt"
+docker compose -f docker-compose.yml -f docker-compose.ca.yml up --build
+```
+
+Przekaż certyfikat CA, nie klucz prywatny. Build korzysta z niego do weryfikacji
+TLS; obrazów nie należy budować z wyłączoną weryfikacją certyfikatów.
+
 ## Polecenia
 
 ```bash

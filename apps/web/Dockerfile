@@ -4,10 +4,14 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json ./
 COPY apps/web/package.json ./apps/web/
-RUN npm install
+RUN --mount=type=secret,id=routeable_ca,required=false \
+	if [ -s /run/secrets/routeable_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/routeable_ca; fi; \
+	npm install
 
 COPY apps/web ./apps/web
-RUN npm run build --workspace @routeable/web
+RUN --mount=type=secret,id=routeable_ca,required=false \
+	if [ -s /run/secrets/routeable_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/routeable_ca; fi; \
+	npm run build --workspace @routeable/web
 
 FROM node:22-alpine AS runtime
 
