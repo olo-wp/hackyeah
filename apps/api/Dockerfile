@@ -25,6 +25,7 @@ COPY apps/mcp ./apps/mcp
 RUN uv sync --no-dev
 
 COPY --chmod=755 apps/api/entrypoint.sh /usr/local/bin/routeable-api-entrypoint
+RUN python -c "from pathlib import Path; p = Path('/usr/local/bin/routeable-api-entrypoint'); p.write_bytes(p.read_bytes().replace(b'\\r\\n', b'\\n'))"
 
 RUN useradd --create-home --uid 10001 routeable
 USER routeable
