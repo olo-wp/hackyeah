@@ -6,7 +6,6 @@ COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    UV_NATIVE_TLS=true \
     PYTHONUNBUFFERED=1 \
     MCP_TRANSPORT=http \
     FASTMCP_HOST=0.0.0.0 \
@@ -17,12 +16,6 @@ COPY pyproject.toml ./
 COPY packages ./packages
 COPY apps/api ./apps/api
 COPY apps/mcp ./apps/mcp
-
-RUN --mount=type=secret,id=routeable_ca,required=false \
-    if [ -s /run/secrets/routeable_ca ]; then \
-        cp /run/secrets/routeable_ca /usr/local/share/ca-certificates/routeable-ca.crt; \
-        update-ca-certificates; \
-    fi
 
 RUN uv sync --no-dev
 

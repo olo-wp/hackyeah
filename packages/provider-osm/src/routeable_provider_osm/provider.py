@@ -1,5 +1,6 @@
 """OpenStreetMap provider: Nominatim for discovery, Overpass for tags."""
 
+import json
 from typing import Any
 
 from routeable_model import (
@@ -9,9 +10,14 @@ from routeable_model import (
     RawAccessibilityEvidence,
     SourceType,
 )
-from routeable_provider_core import HttpClient, SearchOptions
+from routeable_provider_core import (
+    AccessibilityClassifier,
+    HttpClient,
+    SearchOptions,
+    SourceDocument,
+)
 
-from .tags import map_osm_category, map_osm_tags
+from .tags import map_osm_category
 
 OSM_PROVIDER_NAME = "osm"
 
@@ -55,10 +61,12 @@ class OsmProvider:
         overpass_url: str = "https://overpass-api.de/api/interpreter",
         user_agent: str = "RouteAble/0.1",
         timeout_s: float = 8.0,
+        classifier: AccessibilityClassifier | None = None,
     ) -> None:
         self._nominatim_url = nominatim_url.rstrip("/")
         self._overpass_url = overpass_url
         self._http = HttpClient(user_agent=user_agent, timeout_s=timeout_s)
+        self._classifier = classifier
 
     @property
     def name(self) -> str:
@@ -106,9 +114,7 @@ class OsmProvider:
         payload = await self._http.get_json(f"{self._nominatim_url}/lookup", params=params)
         return _to_external_place(payload[0]) if payload else None
 
-    async def get_accessibility_data(
-        self, place: ExternalPlace
-    ) -> list[RawAccessibilityEvidence]:
+    async def get_accessibility_data(self, place: ExternalPlace) -> list[RawAccessibilityEvidence]:
         if place.provider_name != OSM_PROVIDER_NAME:
             return []
 
@@ -127,7 +133,17 @@ class OsmProvider:
         if not tags:
             return []
 
-        return map_osm_tags(tags, f"https://www.openstreetmap.org/{osm_type}/{osm_id}")
+        if self._classifier is None:
+            raise RuntimeError("An AI accessibility classifier is required for OSM data")
+        return await self._classifier.classify(
+            place,
+            [
+                SourceDocument(
+                    url=f"https://www.openstreetmap.org/{osm_type}/{osm_id}",
+                    text=json.dumps(tags, ensure_ascii=False),
+                )
+            ],
+        )
 
     async def aclose(self) -> None:
         await self._http.aclose()

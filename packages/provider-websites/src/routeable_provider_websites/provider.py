@@ -11,15 +11,21 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, Field
+
 from routeable_model import (
     DataSource,
     ExternalPlace,
     RawAccessibilityEvidence,
     SourceType,
 )
-from routeable_provider_core import HttpClient, SearchOptions
+from routeable_provider_core import (
+    AccessibilityClassifier,
+    HttpClient,
+    SearchOptions,
+    SourceDocument,
+)
 
-from .extraction import extract_accessibility_evidence, html_to_text
+from .extraction import html_to_text
 
 WEBSITE_PROVIDER_NAME = "website"
 
@@ -65,9 +71,11 @@ class WebsiteProvider:
         allowlist_path: Path | None = None,
         user_agent: str = "RouteAble/0.1",
         timeout_s: float = 5.0,
+        classifier: AccessibilityClassifier | None = None,
     ) -> None:
         self._sites = _load_allowlist(allowlist_path)
         self._http = HttpClient(user_agent=user_agent, timeout_s=timeout_s)
+        self._classifier = classifier
 
     @property
     def name(self) -> str:
@@ -98,17 +106,19 @@ class WebsiteProvider:
         if site is None:
             return []
 
-        evidence: list[RawAccessibilityEvidence] = []
+        if self._classifier is None:
+            raise RuntimeError("An AI accessibility classifier is required for website data")
+        documents: list[SourceDocument] = []
         for page in site.accessibility_pages:
             url = f"https://{site.domain}{page}"
             try:
                 raw_html = await self._http.get_text(url)
-            except Exception as error:  # noqa: BLE001 - one dead page must not fail the lookup
+            except Exception as error:
                 logger.info("Skipping %s: %s", url, error)
                 continue
-            evidence.extend(extract_accessibility_evidence(html_to_text(raw_html), url))
+            documents.append(SourceDocument(url, html_to_text(raw_html)))
 
-        return evidence
+        return await self._classifier.classify(place, documents)
 
     async def aclose(self) -> None:
         await self._http.aclose()
