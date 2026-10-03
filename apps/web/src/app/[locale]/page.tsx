@@ -104,7 +104,7 @@ export default async function HomePage({
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {legend.map((item) => (
             <div key={item.title} className="kr-card p-4">
-              <p className="text-3xl font-bold text-[#0063af]" aria-hidden="true">
+              <p className="text-3xl font-bold text-[#0064b6]" aria-hidden="true">
                 {item.icon}
               </p>
               <h3 className="mt-1 text-lg font-bold">{item.title}</h3>
@@ -112,7 +112,7 @@ export default async function HomePage({
             </div>
           ))}
         </div>
-        <p className="mt-4 border-l-4 border-[#0063af] bg-[#e8f1f8] px-4 py-3">
+        <p className="mt-4 border-l-4 border-[#0064b6] bg-[#e8f1f8] px-4 py-3">
           <strong>{dict.home.unknownNoticeStrong}</strong> {dict.home.unknownNoticeRest}
         </p>
       </section>

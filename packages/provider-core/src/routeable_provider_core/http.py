@@ -1,11 +1,18 @@
 """Thin httpx wrapper with the limits every outbound call must respect."""
 
+import ssl
 from typing import Any
 
 import httpx
+import truststore
 
 DEFAULT_TIMEOUT_S = 5.0
 DEFAULT_MAX_BYTES = 2 * 1024 * 1024
+
+
+def system_ssl_context() -> ssl.SSLContext:
+    """Trust the OS certificate store so corporate TLS interception works."""
+    return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
 
 class ProviderHttpError(RuntimeError):
@@ -27,6 +34,7 @@ class HttpClient:
         self._client = httpx.AsyncClient(
             timeout=timeout_s,
             follow_redirects=True,
+            verify=system_ssl_context(),
             headers={"User-Agent": user_agent, "Accept-Encoding": "gzip"},
         )
 

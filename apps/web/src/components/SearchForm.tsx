@@ -32,7 +32,7 @@ export function SearchForm({
             minLength={2}
             defaultValue={defaultQuery}
             placeholder={dict.search.placeholder}
-            className="min-w-0 flex-1 border-2 border-[var(--color-rule)] px-3 py-2.5 text-lg focus:border-[#0063af]"
+            className="min-w-0 flex-1 border-2 border-[var(--color-rule)] px-3 py-2.5 text-lg focus:border-[#0064b6]"
           />
           <button type="submit" className="kr-btn">
             {dict.search.submit}
@@ -50,7 +50,7 @@ export function SearchForm({
                 name={key}
                 type="checkbox"
                 value="true"
-                className="h-5 w-5 accent-[#0063af]"
+                className="h-5 w-5 accent-[#0064b6]"
               />
               <label htmlFor={key}>{dict.search.preferences[key]}</label>
             </div>

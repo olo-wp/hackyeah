@@ -2,12 +2,13 @@
 
 /*
  * Design tokens taken from the City of Kraków open data portal
- * (otwartedane.um.krakow.pl): primary #0063AF, Lato, flat square blocks.
+ * (otwartedane.um.krakow.pl). The primary is the exact blue of the city logo
+ * (#0064B6) so the logo blends into the header band seamlessly.
  */
 @theme {
-  --color-krakow: #0063af;
-  --color-krakow-dark: #004f8c;
-  --color-krakow-darker: #003d6e;
+  --color-krakow: #0064b6;
+  --color-krakow-dark: #005092;
+  --color-krakow-darker: #003e72;
   --color-krakow-tint: #e8f1f8;
   --color-ink: #212529;
   --color-muted: #5b6770;

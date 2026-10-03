@@ -62,7 +62,7 @@ export function AccessibilityToolbar({ labels }: { labels: A11yLabels }) {
             title={option.title}
             className={`${option.className} w-9 border-2 py-1 font-bold ${
               fontSize === option.value
-                ? "border-white bg-white text-[#0063af]"
+                ? "border-white bg-white text-[#0064b6]"
                 : "border-transparent hover:border-white"
             }`}
           >

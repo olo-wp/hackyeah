@@ -36,7 +36,7 @@ export function LanguageSwitcher({
             aria-current={active ? "true" : undefined}
             className={`border-2 px-3 py-1 text-sm font-bold uppercase ${
               active
-                ? "border-white bg-white text-[#0063af]"
+                ? "border-white bg-white text-[#0064b6]"
                 : "border-transparent hover:border-white"
             }`}
           >
