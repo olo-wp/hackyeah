@@ -15,7 +15,10 @@ async def serve() -> None:
     server = create_server(container.service)
     try:
         if os.getenv("MCP_TRANSPORT", "stdio") == "http":
-            await server.run_streamable_http_async()
+            await server.run_streamable_http_async(
+                host=os.getenv("FASTMCP_HOST", "127.0.0.1"),
+                port=int(os.getenv("FASTMCP_PORT", "3002")),
+            )
         else:
             await server.run_stdio_async()
     finally:

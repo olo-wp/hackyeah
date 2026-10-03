@@ -6,7 +6,8 @@ exactly the same service the REST API uses (ARCHITECTURE section 63.6).
 
 from typing import Any
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
+
 from routeable_engine import AccessibilityService
 from routeable_model import (
     AccessibilityPreferences,
@@ -26,8 +27,8 @@ Rules when using this data:
 """.strip()
 
 
-def create_server(service: AccessibilityService) -> FastMCP:
-    mcp = FastMCP("routeable", instructions=INSTRUCTIONS)
+def create_server(service: AccessibilityService) -> MCPServer:
+    mcp = MCPServer("routeable", instructions=INSTRUCTIONS)
 
     @mcp.tool()
     async def search_places(
