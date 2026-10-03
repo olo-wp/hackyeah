@@ -1,3 +1,4 @@
+import asyncio
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
@@ -52,3 +53,26 @@ async def test_server_startup_closes_container(
         server.run_stdio_async.assert_awaited_once_with()
         server.run_streamable_http_async.assert_not_awaited()
     container.aclose.assert_awaited_once_with()
+
+
+@pytest.mark.parametrize("platform", ["win32", "linux"])
+def test_main_selects_compatible_event_loop(platform: str) -> None:
+    loop_types: list[type[asyncio.AbstractEventLoop]] = []
+
+    async def serve() -> None:
+        loop_types.append(type(asyncio.get_running_loop()))
+
+    with (
+        patch.object(entry, "sys", SimpleNamespace(platform=platform)),
+        patch.object(entry, "serve", serve),
+    ):
+        entry.main()
+
+    if platform == "win32":
+        assert issubclass(loop_types[0], asyncio.SelectorEventLoop)
+    else:
+        default_loop = asyncio.new_event_loop()
+        try:
+            assert loop_types == [type(default_loop)]
+        finally:
+            default_loop.close()

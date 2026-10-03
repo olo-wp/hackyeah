@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+import sys
 
 # Shared composition root: MCP and REST must run the exact same service instance wiring.
 from routeable_api.config import settings
@@ -26,7 +27,9 @@ async def serve() -> None:
 
 
 def main() -> None:
-    asyncio.run(serve())
+    asyncio.run(
+        serve(), loop_factory=asyncio.SelectorEventLoop if sys.platform == "win32" else None
+    )
 
 
 if __name__ == "__main__":
