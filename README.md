@@ -92,7 +92,6 @@ Migracje przy lokalnym uruchamianiu bez kontenerów:
 uv run --env-file .env routeable-migrate
 ```
 
-<<<<<<< HEAD
 Jeśli sieć używa firmowego CA i build kontenerów kończy się błędem
 `invalid peer certificate: UnknownIssuer`, wyeksportuj z Windows zaufany
 certyfikat główny jako Base-64 X.509 (PEM) poza repozytorium. Następnie
@@ -105,7 +104,7 @@ docker compose -f docker-compose.yml -f docker-compose.ca.yml up --build
 
 Przekaż certyfikat CA, nie klucz prywatny. Build korzysta z niego do weryfikacji
 TLS; obrazów nie należy budować z wyłączoną weryfikacją certyfikatów.
-=======
+
 Całość w kontenerach (Compose automatycznie odczytuje `.env`):
 
 ```bash
@@ -119,7 +118,6 @@ a dopiero po powodzeniu uruchamia serwer. MCP czeka na gotowość API.
 Migracje wykonują się przy starcie kontenera, nie podczas budowania obrazu.
 Użytkownik bazy musi mieć uprawnienia do tworzenia tabel i indeksów w docelowym schemacie.
 Obecna migracja używa `CREATE TABLE/INDEX IF NOT EXISTS`, więc może być ponawiana.
->>>>>>> 1822ef65ca7e6acc8a0f3c91882d1b64eba5d88f
 
 ## Polecenia
 
