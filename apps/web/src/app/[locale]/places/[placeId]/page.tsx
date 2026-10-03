@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FeatureGroup } from "@/components/FeatureGroup";
+import { RoutePlanner } from "@/components/RoutePlanner";
 import { getDictionary } from "@/i18n";
 import { isLocale } from "@/i18n/config";
 import { ApiError, getPlaceAccessibility } from "@/lib/api";
@@ -138,6 +139,7 @@ export default async function PlacePage({
           }
         ]}
       />
+      <RoutePlanner place={place} dict={dict} />
     </>
   );
 }
