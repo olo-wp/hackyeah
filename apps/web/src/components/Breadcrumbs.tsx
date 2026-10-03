@@ -1,17 +1,27 @@
 import Link from "next/link";
+import type { Locale } from "@/i18n/config";
 
 export interface Crumb {
   href?: string;
   label: string;
 }
 
-export function Breadcrumbs({ items }: { items: Crumb[] }) {
+export function Breadcrumbs({
+  items,
+  locale,
+  labels
+}: {
+  items: Crumb[];
+  locale: Locale;
+  labels: { label: string; home: string };
+}) {
   return (
-    <nav aria-label="Ścieżka nawigacji" className="border-b border-[var(--color-rule)] py-3">
+    <nav aria-label={labels.label} className="border-b border-[var(--color-rule)] py-3">
       <ol className="flex flex-wrap items-center gap-2 text-sm">
         <li>
-          <Link href="/" className="link-kr">
-            <span aria-hidden="true">⌂ </span>Start
+          <Link href={`/${locale}`} className="link-kr">
+            <span aria-hidden="true">⌂ </span>
+            {labels.home}
           </Link>
         </li>
         {items.map((item) => (

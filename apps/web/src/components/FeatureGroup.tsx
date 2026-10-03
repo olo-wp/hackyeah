@@ -1,32 +1,40 @@
+import type { Dictionary } from "@/i18n";
 import type { AccessibilityFeature } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 
-const CONFIDENCE_LABEL = {
-  high: "wysoka",
-  medium: "średnia",
-  low: "niska"
-} as const;
+type Surfaces = Dictionary["surfaces"];
 
-function renderValue(feature: AccessibilityFeature): string {
-  if (feature.status === "conflicting") return "wymaga weryfikacji";
-  if (feature.value === null || feature.value === undefined) return "brak danych";
-  if (typeof feature.value === "boolean") return feature.value ? "tak" : "nie";
+function renderValue(feature: AccessibilityFeature, dict: Dictionary): string {
+  if (feature.status === "conflicting") return dict.value.needsVerification;
+  if (feature.value === null || feature.value === undefined) return dict.value.noData;
+  if (typeof feature.value === "boolean") return feature.value ? dict.value.yes : dict.value.no;
+
+  if (feature.key === "surface" && typeof feature.value === "string") {
+    return dict.surfaces[feature.value as keyof Surfaces] ?? feature.value;
+  }
+
   return String(feature.value);
 }
 
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("pl-PL");
-}
+export function FeatureRow({
+  label,
+  feature,
+  dict
+}: {
+  label: string;
+  feature: AccessibilityFeature;
+  dict: Dictionary;
+}) {
+  const formatDate = (value: string) => new Date(value).toLocaleDateString(dict.localeTag);
 
-export function FeatureRow({ label, feature }: { label: string; feature: AccessibilityFeature }) {
   return (
     <li className="border-b border-[var(--color-rule)] px-4 py-4 last:border-b-0">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="text-lg font-bold">{label}</h3>
-        <StatusBadge status={feature.status} />
+        <StatusBadge status={feature.status} labels={dict.status} />
       </div>
 
-      <p className="mt-1 text-lg">{renderValue(feature)}</p>
+      <p className="mt-1 text-lg">{renderValue(feature, dict)}</p>
 
       {feature.conflict_reason ? (
         <p className="mt-2 border-l-4 border-[#8a4b00] bg-[#fdf0e0] px-3 py-2 text-sm text-[#8a4b00]">
@@ -37,8 +45,10 @@ export function FeatureRow({ label, feature }: { label: string; feature: Accessi
       {feature.evidence.length > 0 ? (
         <details className="mt-3">
           <summary className="link-kr cursor-pointer text-sm font-bold">
-            Pokaż źródła ({feature.evidence.length})
-            {feature.confidence ? ` · wiarygodność: ${CONFIDENCE_LABEL[feature.confidence]}` : ""}
+            {dict.place.showSources} ({feature.evidence.length})
+            {feature.confidence
+              ? ` · ${dict.place.confidencePrefix}: ${dict.confidence[feature.confidence]}`
+              : ""}
           </summary>
 
           <ul className="mt-2 border border-[var(--color-rule)]">
@@ -62,17 +72,18 @@ export function FeatureRow({ label, feature }: { label: string; feature: Accessi
                   )}
                 </p>
                 <p className="text-[var(--color-muted)]">
-                  Wartość: {String(item.value)} · Sprawdzono: {formatDate(item.retrieved_at)}
-                  {item.source.license ? ` · Licencja: ${item.source.license}` : ""}
+                  {dict.place.evidenceValue}: {String(item.value)} ·{" "}
+                  {dict.place.evidenceCheckedAt}: {formatDate(item.retrieved_at)}
+                  {item.source.license
+                    ? ` · ${dict.place.evidenceLicense}: ${item.source.license}`
+                    : ""}
                 </p>
               </li>
             ))}
           </ul>
         </details>
       ) : (
-        <p className="mt-2 text-sm text-[var(--color-muted)]">
-          Żadne źródło nie zawiera tej informacji.
-        </p>
+        <p className="mt-2 text-sm text-[var(--color-muted)]">{dict.place.noSources}</p>
       )}
     </li>
   );
@@ -80,17 +91,19 @@ export function FeatureRow({ label, feature }: { label: string; feature: Accessi
 
 export function FeatureGroup({
   title,
-  features
+  features,
+  dict
 }: {
   title: string;
   features: Array<{ label: string; feature: AccessibilityFeature }>;
+  dict: Dictionary;
 }) {
   return (
     <section className="mt-8">
       <h2 className="kr-card-blue px-4 py-3 text-xl font-bold">{title}</h2>
       <ul className="kr-card border-t-0">
         {features.map(({ label, feature }) => (
-          <FeatureRow key={feature.key} label={label} feature={feature} />
+          <FeatureRow key={feature.key} label={label} feature={feature} dict={dict} />
         ))}
       </ul>
     </section>
