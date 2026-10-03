@@ -7,15 +7,16 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from routeable_engine import PlaceNotFoundError
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
+from routeable_engine import PlaceNotFoundError
+
 from .config import Settings, settings
 from .container import build_container
-from .routers import community, places, reports
+from .routers import community, places, reports, routes
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,6 +41,7 @@ def create_app(app_settings: Settings | None = None) -> FastAPI:
     )
 
     app.state.limiter = limiter
+    app.state.route_settings = app_settings
     app.add_middleware(SlowAPIMiddleware)
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_middleware(
@@ -61,6 +63,7 @@ def create_app(app_settings: Settings | None = None) -> FastAPI:
 
     app.include_router(places.router)
     app.include_router(reports.router)
+    app.include_router(routes.router)
     app.include_router(community.router)
 
     return app

@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     gemini_fallback_model: str | None = "gemini-3.5-flash-lite"
     gemini_timeout_s: float = Field(default=60.0, gt=0)
     gemini_max_input_chars: int = Field(default=60000, gt=0)
+    ors_api_key: SecretStr | None = None
 
     cors_origins: list[str] = ["http://localhost:3000"]
     rate_limit: str = "120/minute"

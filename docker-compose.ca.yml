@@ -1,14 +1,20 @@
 services:
   api:
     build:
+      args:
+        CACHE_BUSTER: ${ROUTEABLE_CA_CERT}
       secrets:
         - routeable_ca
   mcp:
     build:
+      args:
+        CACHE_BUSTER: ${ROUTEABLE_CA_CERT}
       secrets:
         - routeable_ca
   web:
     build:
+      args:
+        CACHE_BUSTER: ${ROUTEABLE_CA_CERT}
       secrets:
         - routeable_ca
 

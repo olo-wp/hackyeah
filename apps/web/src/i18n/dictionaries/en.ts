@@ -70,6 +70,7 @@ export const en: Dictionary = {
     errorStatus: "Could not load results ({status}).",
     errorConnection: "Could not reach the API.",
     showDetails: "Show accessibility details",
+    showRoute: "Show route",
     legendHeading: "How to read the information",
     legend: {
       confirmed: {
@@ -118,6 +119,27 @@ export const en: Dictionary = {
     evidenceCheckedAt: "Checked",
     evidenceLicense: "Licence",
     confidencePrefix: "confidence"
+  },
+
+  route: {
+    heading: "Walking route",
+    disclaimer: "Route accessibility has not been verified. Check the place information before travelling.",
+    currentLocation: "Use my location",
+    locationDenied: "Could not get your location. Enter a starting address instead.",
+    startAddress: "Starting address",
+    addressPlaceholder: "e.g. Main Square, Kraków",
+    searchAddress: "Find address",
+    addressResults: "Choose an address",
+    noAddresses: "No address found. Try a different search.",
+    addressError: "Could not find addresses. Please try again.",
+    routeError: "Could not calculate a route. Check your starting point and try again.",
+    noRoute: "No walking route found between these places.",
+    notConfigured: "Routing is not configured.",
+    calculating: "Calculating route…",
+    searchPending: "Finding addresses…",
+    summary: "Route: {distance} km, about {minutes} min",
+    mapUnavailable: "Map unavailable. You can still read the place details.",
+    mapLabel: "Route map to {place}"
   },
 
   groups: {

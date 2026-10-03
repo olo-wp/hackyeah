@@ -67,6 +67,7 @@ export const pl = {
     errorStatus: "Nie udało się pobrać wyników ({status}).",
     errorConnection: "Nie udało się połączyć z API.",
     showDetails: "Pokaż szczegóły dostępności",
+    showRoute: "Pokaż trasę",
     legendHeading: "Jak czytać informacje",
     legend: {
       confirmed: {
@@ -115,6 +116,27 @@ export const pl = {
     evidenceCheckedAt: "Sprawdzono",
     evidenceLicense: "Licencja",
     confidencePrefix: "wiarygodność"
+  },
+
+  route: {
+    heading: "Trasa piesza",
+    disclaimer: "Dostępność trasy nie jest zweryfikowana. Sprawdź informacje o miejscu przed podróżą.",
+    currentLocation: "Użyj mojej lokalizacji",
+    locationDenied: "Nie udało się pobrać lokalizacji. Wpisz adres początku trasy.",
+    startAddress: "Adres początku trasy",
+    addressPlaceholder: "np. Rynek Główny, Kraków",
+    searchAddress: "Znajdź adres",
+    addressResults: "Wybierz adres",
+    noAddresses: "Nie znaleziono adresu. Spróbuj wpisać go inaczej.",
+    addressError: "Nie udało się wyszukać adresów. Spróbuj ponownie.",
+    routeError: "Nie udało się wyznaczyć trasy. Sprawdź punkt startowy i spróbuj ponownie.",
+    noRoute: "Nie znaleziono trasy pieszej między tymi miejscami.",
+    notConfigured: "Wyznaczanie trasy nie jest skonfigurowane.",
+    calculating: "Wyznaczam trasę…",
+    searchPending: "Szukam adresów…",
+    summary: "Trasa: {distance} km, około {minutes} min",
+    mapUnavailable: "Mapa jest niedostępna. Możesz nadal przeczytać szczegóły miejsca.",
+    mapLabel: "Mapa trasy do {place}"
   },
 
   groups: {

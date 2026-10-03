@@ -16,6 +16,17 @@ export interface GeoLocation {
   lng: number;
 }
 
+export interface RouteOrigin {
+  label: string;
+  location: GeoLocation;
+}
+
+export interface WalkingRoute {
+  geometry: { type: "LineString"; coordinates: [number, number][] };
+  distance_m: number;
+  duration_s: number;
+}
+
 export interface Place {
   id: string;
   name: string;

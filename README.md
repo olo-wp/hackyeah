@@ -93,17 +93,29 @@ uv run --env-file .env routeable-migrate
 ```
 
 Jeśli sieć używa firmowego CA i build kontenerów kończy się błędem
-`invalid peer certificate: UnknownIssuer`, wyeksportuj z Windows zaufany
-certyfikat główny jako Base-64 X.509 (PEM) poza repozytorium. Następnie
-w PowerShell uruchom:
+`invalid peer certificate: UnknownIssuer`, wyeksportuj zaufany certyfikat
+główny jako Base-64 X.509 (PEM) poza repozytorium. Ścieżka jest podawana
+zmienną środowiskową na hoście, więc działa natywnie zarówno w PowerShell,
+jak i w macOS/Linux. BuildKit montuje certyfikat wewnątrz linuksowego obrazu:
+API/MCP dodają go do systemowego magazynu CA, a web używa go tylko podczas
+`npm install` i buildu Next.js. Weryfikacja TLS pozostaje włączona.
+
+PowerShell:
 
 ```powershell
 $env:ROUTEABLE_CA_CERT = "C:\certs\company-root.crt"
 docker compose -f docker-compose.yml -f docker-compose.ca.yml up --build
 ```
 
-Przekaż certyfikat CA, nie klucz prywatny. Build korzysta z niego do weryfikacji
-TLS; obrazów nie należy budować z wyłączoną weryfikacją certyfikatów.
+macOS/Linux:
+
+```bash
+export ROUTEABLE_CA_CERT="$HOME/certs/company-root.crt"
+docker compose -f docker-compose.yml -f docker-compose.ca.yml up --build
+```
+
+Przekaż certyfikat CA, nie klucz prywatny. Bez certyfikatu użyj zwykłego
+`docker compose up --build`; dodatkowa konfiguracja CA jest opcjonalna.
 
 Całość w kontenerach (Compose automatycznie odczytuje `.env`):
 
@@ -118,6 +130,23 @@ a dopiero po powodzeniu uruchamia serwer. MCP czeka na gotowość API.
 Migracje wykonują się przy starcie kontenera, nie podczas budowania obrazu.
 Użytkownik bazy musi mieć uprawnienia do tworzenia tabel i indeksów w docelowym schemacie.
 Obecna migracja używa `CREATE TABLE/INDEX IF NOT EXISTS`, więc może być ponawiana.
+
+### Mapa i trasa piesza
+
+Mapa miejsca korzysta z MapLibre i kafelków MapTiler. Geokodowanie adresu startowego
+i wyznaczenie zwykłej trasy pieszej wykonuje OpenRouteService przez API RouteAble:
+`GET /api/routes/origins?q=...` oraz `POST /api/routes/walking`. Trasa nie jest
+potwierdzeniem dostępności chodników, krawężników ani nawierzchni.
+
+Ustaw `ORS_API_KEY` w głównym `.env` (klucz pozostaje wyłącznie na backendzie).
+Do lokalnego `npm run dev` ustaw `NEXT_PUBLIC_MAPTILER_KEY` w
+`apps/web/.env.local` (plik jest ignorowany przez Git). Ten klucz jest publiczny
+w przeglądarce, dlatego ogranicz jego dozwolony origin do `localhost` lub
+`127.0.0.1`; w produkcji użyj osobnego klucza ograniczonego do domeny serwisu.
+Przy budowaniu obrazu web przez Compose ustaw `NEXT_PUBLIC_MAPTILER_KEY` w głównym
+`.env`, ponieważ Next.js osadza go w kodzie podczas buildu. Po zmianie klucza
+zrestartuj `npm run dev` lub przebuduj obraz. Bez klucza mapy szczegóły miejsca
+pozostają dostępne, a interfejs pokazuje informację o braku mapy.
 
 ## Polecenia
 

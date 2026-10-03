@@ -69,6 +69,9 @@ export async function SearchResults({
             {detailsLabel}
             <span aria-hidden="true"> ▷</span>
           </Link>
+          <Link href={`${placeHref(place.id)}#route`} className="link-kr ml-5 inline-block text-sm font-bold">
+            {dict.home.showRoute}
+          </Link>
         </li>
       ))}
     </ul>

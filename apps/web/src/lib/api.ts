@@ -1,10 +1,13 @@
 import type {
   AccessibilityPreferences,
+  GeoLocation,
   CommunityFeatureKey,
   CommunitySummary,
   DoorstepLevel,
   PlaceAccessibilityResult,
-  PlaceSearchResult
+  PlaceSearchResult,
+  RouteOrigin,
+  WalkingRoute
 } from "./types";
 
 const API_URL = (process.env.ROUTEABLE_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
@@ -51,6 +54,23 @@ export function getPlaceAccessibility(
     `/api/places/${encodeURIComponent(placeId)}/accessibility`,
     params
   );
+}
+
+export async function findRouteOrigins(query: string): Promise<RouteOrigin[]> {
+  const response = await fetch(`/route-api/origins?q=${encodeURIComponent(query)}`);
+  if (!response.ok) throw new ApiError("Address search failed", response.status);
+  const data = (await response.json()) as { results: RouteOrigin[] };
+  return data.results;
+}
+
+export async function getWalkingRoute(placeId: string, start: GeoLocation): Promise<WalkingRoute> {
+  const response = await fetch("/route-api/walking", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ place_id: placeId, start })
+  });
+  if (!response.ok) throw new ApiError("Walking route failed", response.status);
+  return (await response.json()) as WalkingRoute;
 }
 
 export function getCommunitySummary(placeId: string): Promise<CommunitySummary> {
