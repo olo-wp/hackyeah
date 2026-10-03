@@ -16,7 +16,7 @@ from routeable_engine import PlaceNotFoundError
 
 from .config import Settings, settings
 from .container import build_container
-from .routers import places, reports, routes
+from .routers import community, places, reports, routes
 
 logging.basicConfig(level=logging.INFO)
 
@@ -64,6 +64,7 @@ def create_app(app_settings: Settings | None = None) -> FastAPI:
     app.include_router(places.router)
     app.include_router(reports.router)
     app.include_router(routes.router)
+    app.include_router(community.router)
 
     return app
 

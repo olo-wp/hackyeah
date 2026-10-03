@@ -15,18 +15,22 @@ from routeable_model import (
     AccessibilityPreferences,
     AccessibilityProfile,
     AccessibilityReport,
+    CommunityContribution,
+    CommunitySummary,
     DataSource,
     Evidence,
     ExternalIds,
     ExternalPlace,
     FeatureKey,
     NewAccessibilityReport,
+    NewCommunityContribution,
     Place,
     PreferenceEvaluation,
     SourceType,
 )
 from routeable_provider_core import AccessibilityProvider, ProviderRegistry, SearchOptions
 
+from .community import COMMUNITY_FRESH_WINDOW_DAYS, summarize_contributions
 from .identity import is_same_place
 from .place_id import build_place_id, parse_place_id
 from .preferences import evaluate_preferences
@@ -199,6 +203,25 @@ class AccessibilityService:
 
     async def list_reports(self, place_id: str | None = None) -> list[AccessibilityReport]:
         return await self._store.list_reports(place_id)
+
+    async def submit_community_contribution(
+        self, new: NewCommunityContribution
+    ) -> CommunityContribution:
+        """Anonymous, uncertain answers kept apart from provider evidence."""
+        if await self._store.get_place(new.place_id) is None:
+            raise PlaceNotFoundError(new.place_id)
+        contribution = CommunityContribution(
+            **new.model_dump(), id=str(uuid4()), submitted_at=self._now()
+        )
+        await self._store.add_community_contribution(contribution)
+        return contribution
+
+    async def get_community_summary(self, place_id: str) -> CommunitySummary:
+        if await self._store.get_place(place_id) is None:
+            raise PlaceNotFoundError(place_id)
+        since = self._now() - timedelta(days=COMMUNITY_FRESH_WINDOW_DAYS)
+        contributions = await self._store.get_community_contributions(place_id, since=since)
+        return summarize_contributions(place_id, contributions)
 
     async def _collect_evidence(self, place: Place) -> list[ProviderStatus]:
         external = _to_external_place(place)

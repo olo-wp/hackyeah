@@ -1,11 +1,16 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { CommunityAnswers } from "@/components/CommunityAnswers";
 import { FeatureGroup } from "@/components/FeatureGroup";
 import { RoutePlanner } from "@/components/RoutePlanner";
 import { getDictionary } from "@/i18n";
 import { isLocale } from "@/i18n/config";
-import { ApiError, getPlaceAccessibility } from "@/lib/api";
-import type { AccessibilityPreferences, PreferenceEvaluation } from "@/lib/types";
+import { ApiError, getCommunitySummary, getPlaceAccessibility } from "@/lib/api";
+import type {
+  AccessibilityPreferences,
+  CommunitySummary,
+  PreferenceEvaluation
+} from "@/lib/types";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -50,6 +55,13 @@ export default async function PlacePage({
 
   const { place, profile, preference_evaluation: evaluations } = data;
   const labels = dict.features;
+
+  let community: CommunitySummary | null = null;
+  try {
+    community = await getCommunitySummary(decodeURIComponent(placeId));
+  } catch {
+    community = null;
+  }
 
   return (
     <>
@@ -140,6 +152,15 @@ export default async function PlacePage({
         ]}
       />
       <RoutePlanner place={place} dict={dict} />
+
+      {community ? (
+        <CommunityAnswers
+          locale={locale}
+          placeId={place.id}
+          summary={community}
+          dict={dict.community}
+        />
+      ) : null}
     </>
   );
 }

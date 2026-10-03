@@ -1,5 +1,14 @@
 """RouteAble shared accessibility model."""
 
+from .community import (
+    CommunityAnswer,
+    CommunityContribution,
+    CommunityFeatureKey,
+    CommunityFeatureSummary,
+    CommunitySummary,
+    DoorstepLevel,
+    NewCommunityContribution,
+)
 from .evidence import Evidence, RawAccessibilityEvidence, VerificationStatus
 from .features import (
     ConfidenceLevel,
@@ -38,8 +47,14 @@ __all__ = [
     "AccessibilityPreferences",
     "AccessibilityProfile",
     "AccessibilityReport",
+    "CommunityAnswer",
+    "CommunityContribution",
+    "CommunityFeatureKey",
+    "CommunityFeatureSummary",
+    "CommunitySummary",
     "ConfidenceLevel",
     "DataSource",
+    "DoorstepLevel",
     "EntranceFeatures",
     "Evidence",
     "ExternalIds",
@@ -51,6 +66,7 @@ __all__ = [
     "InteriorFeatures",
     "ModerationStatus",
     "NewAccessibilityReport",
+    "NewCommunityContribution",
     "Place",
     "PlaceCategory",
     "PreferenceEvaluation",

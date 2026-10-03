@@ -4,7 +4,14 @@ import unicodedata
 from datetime import datetime
 from typing import Protocol
 
-from routeable_model import AccessibilityReport, Evidence, FeatureKey, Place
+from routeable_model import (
+    AccessibilityReport,
+    CommunityContribution,
+    CommunityFeatureKey,
+    Evidence,
+    FeatureKey,
+    Place,
+)
 
 
 class EvidenceStore(Protocol):
@@ -34,6 +41,15 @@ class EvidenceStore(Protocol):
 
     async def list_reports(self, place_id: str | None = None) -> list[AccessibilityReport]: ...
 
+    async def add_community_contribution(self, contribution: CommunityContribution) -> None: ...
+
+    async def get_community_contributions(
+        self,
+        place_id: str,
+        feature_key: CommunityFeatureKey | None = None,
+        since: datetime | None = None,
+    ) -> list[CommunityContribution]: ...
+
 
 def _normalize(text: str) -> str:
     decomposed = unicodedata.normalize("NFD", text)
@@ -48,6 +64,7 @@ class InMemoryEvidenceStore:
         self._evidence: dict[str, list[Evidence]] = {}
         self._fetched_at: dict[tuple[str, str], datetime] = {}
         self._reports: list[AccessibilityReport] = []
+        self._community: list[CommunityContribution] = []
 
     async def save_place(self, place: Place) -> None:
         self._places[place.id] = place
@@ -87,3 +104,19 @@ class InMemoryEvidenceStore:
         if place_id is None:
             return list(self._reports)
         return [report for report in self._reports if report.place_id == place_id]
+
+    async def add_community_contribution(self, contribution: CommunityContribution) -> None:
+        self._community.append(contribution)
+
+    async def get_community_contributions(
+        self,
+        place_id: str,
+        feature_key: CommunityFeatureKey | None = None,
+        since: datetime | None = None,
+    ) -> list[CommunityContribution]:
+        items = [c for c in self._community if c.place_id == place_id]
+        if feature_key is not None:
+            items = [c for c in items if c.feature_key == feature_key]
+        if since is not None:
+            items = [c for c in items if c.submitted_at >= since]
+        return sorted(items, key=lambda c: c.submitted_at, reverse=True)

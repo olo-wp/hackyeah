@@ -22,6 +22,7 @@ export const en: Dictionary = {
   nav: {
     label: "Main menu",
     search: "Find a place",
+    contribute: "Help others",
     howItWorks: "How it works",
     sources: "Data sources"
   },
@@ -221,6 +222,40 @@ export const en: Dictionary = {
     cached: "from cache",
     failed: "source unavailable — cached data used",
     not_applicable: "no data for this place"
+  },
+
+  community: {
+    heading: "Help others — add information",
+    intro:
+      "Answers from users are anonymous and approximate. They do not replace verified data from sources, but they help other people plan their visit.",
+    responses: "Responses",
+    noResponses: "No answers yet — be the first to respond.",
+    submit: "Send answer",
+    submitting: "Sending…",
+    success: "Thank you! Your answer has been saved.",
+    error: "We could not save your answer. Please try again.",
+    topBadge: "most common answer",
+    answersHeading: "Community answers",
+    selectPrompt: "Search for a place to add your answers.",
+    answerCta: "Add your answers",
+    notFound: "We couldn't load that place. Try searching for it again.",
+    features: {
+      accessible_parking: "Accessible parking space",
+      accessible_toilet: "Accessible toilet",
+      step_free_entrance: "Step-free entrance",
+      ramp: "Ramp",
+      elevator: "Lift",
+      doorstep: "Doorstep at the entrance"
+    },
+    answers: {
+      yes: "Yes",
+      no: "No"
+    },
+    doorstepLevels: {
+      none: "No doorstep",
+      small: "Small doorstep",
+      high: "High doorstep"
+    }
   },
 
   footer: {

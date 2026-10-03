@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const nav = [
     { href: `/${locale}`, label: dict.nav.search },
+    { href: `/${locale}/contribute`, label: dict.nav.contribute },
     { href: `/${locale}#jak-to-dziala`, label: dict.nav.howItWorks },
     { href: `/${locale}#zrodla`, label: dict.nav.sources }
   ];
@@ -19,7 +20,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
         <div className="flex flex-col items-center gap-3 pt-5 sm:flex-row sm:justify-center">
           <Link href={`/${locale}`} className="flex items-center gap-4">
             <Image
-              src="/krakow-logo.png"
+              src="/img/krakow-logo.png"
               alt={dict.common.krakowLogoAlt}
               width={180}
               height={60}

@@ -15,13 +15,18 @@ const PREFERENCE_KEYS = [
 export function SearchForm({
   locale,
   dict,
-  defaultQuery = ""
+  defaultQuery = "",
+  basePath,
+  showPreferences = true
 }: {
   locale: Locale;
   dict: Dictionary;
   defaultQuery?: string;
+  basePath?: string;
+  showPreferences?: boolean;
 }) {
   const router = useRouter();
+  const target = basePath ?? `/${locale}`;
 
   // A native GET submit reloads the route and resets the scroll position, so
   // navigate through the router instead. The plain `action` stays as a no-JS fallback.
@@ -32,15 +37,17 @@ export function SearchForm({
     if (query.length < 2) return;
 
     const params = new URLSearchParams({ q: query });
-    for (const key of PREFERENCE_KEYS) {
-      if (data.get(key) === "true") params.set(key, "true");
+    if (showPreferences) {
+      for (const key of PREFERENCE_KEYS) {
+        if (data.get(key) === "true") params.set(key, "true");
+      }
     }
-    router.push(`/${locale}?${params.toString()}`, { scroll: false });
+    router.push(`${target}?${params.toString()}`, { scroll: false });
   }
 
   return (
     <form
-      action={`/${locale}`}
+      action={target}
       method="get"
       onSubmit={handleSubmit}
       className="kr-card p-6"
@@ -66,24 +73,26 @@ export function SearchForm({
         </div>
       </div>
 
-      <fieldset className="mt-6">
-        <legend className="text-lg font-bold">{dict.search.requirementsLegend}</legend>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {PREFERENCE_KEYS.map((key) => (
-            <div key={key} className="flex items-center gap-3">
-              <input
-                id={key}
-                name={key}
-                type="checkbox"
-                value="true"
-                className="h-5 w-5 accent-[#0064b6]"
-              />
-              <label htmlFor={key}>{dict.search.preferences[key]}</label>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-sm text-[var(--color-muted)]">{dict.search.requirementsHint}</p>
-      </fieldset>
+      {showPreferences ? (
+        <fieldset className="mt-6">
+          <legend className="text-lg font-bold">{dict.search.requirementsLegend}</legend>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {PREFERENCE_KEYS.map((key) => (
+              <div key={key} className="flex items-center gap-3">
+                <input
+                  id={key}
+                  name={key}
+                  type="checkbox"
+                  value="true"
+                  className="h-5 w-5 accent-[#0064b6]"
+                />
+                <label htmlFor={key}>{dict.search.preferences[key]}</label>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-sm text-[var(--color-muted)]">{dict.search.requirementsHint}</p>
+        </fieldset>
+      ) : null}
     </form>
   );
 }

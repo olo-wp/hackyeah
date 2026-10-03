@@ -62,7 +62,7 @@ export default async function HomePage({
     <>
       <section className="kr-card flex flex-col items-center gap-6 p-6 sm:flex-row sm:p-8">
         <Image
-          src="/logo.png"
+          src="/img/logo.png"
           alt={dict.common.logoAlt}
           width={200}
           height={200}

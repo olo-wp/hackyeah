@@ -1,6 +1,9 @@
 import type {
   AccessibilityPreferences,
   GeoLocation,
+  CommunityFeatureKey,
+  CommunitySummary,
+  DoorstepLevel,
   PlaceAccessibilityResult,
   PlaceSearchResult,
   RouteOrigin,
@@ -68,4 +71,25 @@ export async function getWalkingRoute(placeId: string, start: GeoLocation): Prom
   });
   if (!response.ok) throw new ApiError("Walking route failed", response.status);
   return (await response.json()) as WalkingRoute;
+}
+
+export function getCommunitySummary(placeId: string): Promise<CommunitySummary> {
+  return get<CommunitySummary>(`/api/places/${encodeURIComponent(placeId)}/community`);
+}
+
+export async function postCommunityContribution(
+  placeId: string,
+  featureKey: CommunityFeatureKey,
+  value: boolean | DoorstepLevel
+): Promise<void> {
+  const response = await fetch(`${API_URL}/api/places/${encodeURIComponent(placeId)}/community`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ feature_key: featureKey, value })
+  });
+
+  if (!response.ok) {
+    throw new ApiError("Request to submit a community contribution failed", response.status);
+  }
 }

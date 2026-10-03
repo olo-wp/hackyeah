@@ -7,6 +7,8 @@ from psycopg.types.json import Json
 from psycopg_pool import AsyncConnectionPool
 from routeable_model import (
     AccessibilityReport,
+    CommunityContribution,
+    CommunityFeatureKey,
     DataSource,
     Evidence,
     ExternalIds,
@@ -46,6 +48,16 @@ def _to_evidence(row: Row) -> Evidence:
         observed_at=row["observed_at"],
         verification_status=row["verification_status"],
         raw_data=row["raw_data"],
+    )
+
+
+def _to_community_contribution(row: Row) -> CommunityContribution:
+    return CommunityContribution(
+        id=str(row["id"]),
+        place_id=row["place_id"],
+        feature_key=row["feature_key"],
+        value=row["value"],
+        submitted_at=row["submitted_at"],
     )
 
 
@@ -239,3 +251,40 @@ class PostgresEvidenceStore:
             )
             for row in rows
         ]
+
+    async def add_community_contribution(self, contribution: CommunityContribution) -> None:
+        async with self._pool.connection() as conn:
+            await conn.execute(
+                """
+                INSERT INTO community_contributions
+                    (id, place_id, feature_key, value, submitted_at)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (
+                    contribution.id,
+                    contribution.place_id,
+                    contribution.feature_key.value,
+                    Json(contribution.value),
+                    contribution.submitted_at,
+                ),
+            )
+
+    async def get_community_contributions(
+        self,
+        place_id: str,
+        feature_key: CommunityFeatureKey | None = None,
+        since: datetime | None = None,
+    ) -> list[CommunityContribution]:
+        async with self._pool.connection() as conn:
+            cursor = await conn.execute(
+                """
+                SELECT * FROM community_contributions
+                 WHERE place_id = %s
+                   AND (%s::text IS NULL OR feature_key = %s)
+                   AND (%s::timestamptz IS NULL OR submitted_at >= %s)
+                 ORDER BY submitted_at DESC
+                """,
+                (place_id, feature_key, feature_key, since, since),
+            )
+            rows = await cursor.fetchall()
+        return [_to_community_contribution(row) for row in rows]

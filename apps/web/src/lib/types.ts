@@ -130,3 +130,29 @@ export interface AccessibilityPreferences {
   avoid_cobblestone?: boolean;
   min_door_width_cm?: number;
 }
+
+export type DoorstepLevel = "none" | "small" | "high";
+
+export type CommunityFeatureKey =
+  | "accessible_parking"
+  | "accessible_toilet"
+  | "step_free_entrance"
+  | "ramp"
+  | "elevator"
+  | "doorstep";
+
+export type CommunityValue = boolean | DoorstepLevel;
+
+export interface CommunityFeatureSummary {
+  feature_key: CommunityFeatureKey;
+  total_responses: number;
+  distribution: Record<string, number>;
+  top_value: CommunityValue | null;
+  latest_value: CommunityValue | null;
+  last_submitted_at: string | null;
+}
+
+export interface CommunitySummary {
+  place_id: string;
+  features: CommunityFeatureSummary[];
+}
