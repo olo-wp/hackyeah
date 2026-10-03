@@ -127,6 +127,18 @@ class AccessibilityService:
         for place in places:
             await self._store.save_place(place)
 
+        # Previously ingested places keep search usable when an upstream source is down.
+        if len(places) < options.limit:
+            kept = [_to_external_place(place) for place in places]
+            for stored in await self._store.search_places(query, options.limit):
+                if len(places) >= options.limit:
+                    break
+                external = _to_external_place(stored)
+                if any(is_same_place(external, other) for other in kept):
+                    continue
+                kept.append(external)
+                places.append(stored)
+
         return PlaceSearchResult(results=places, provider_status=provider_status)
 
     async def get_place(self, place_id: str) -> Place:
