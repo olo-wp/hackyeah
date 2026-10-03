@@ -1,3 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import type { FormEvent } from "react";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n";
 
@@ -17,8 +21,30 @@ export function SearchForm({
   dict: Dictionary;
   defaultQuery?: string;
 }) {
+  const router = useRouter();
+
+  // A native GET submit reloads the route and resets the scroll position, so
+  // navigate through the router instead. The plain `action` stays as a no-JS fallback.
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const query = String(data.get("q") ?? "").trim();
+    if (query.length < 2) return;
+
+    const params = new URLSearchParams({ q: query });
+    for (const key of PREFERENCE_KEYS) {
+      if (data.get(key) === "true") params.set(key, "true");
+    }
+    router.push(`/${locale}?${params.toString()}`, { scroll: false });
+  }
+
   return (
-    <form action={`/${locale}`} method="get" className="kr-card p-6">
+    <form
+      action={`/${locale}`}
+      method="get"
+      onSubmit={handleSubmit}
+      className="kr-card p-6"
+    >
       <div>
         <label htmlFor="q" className="block text-lg font-bold">
           {dict.search.label}
