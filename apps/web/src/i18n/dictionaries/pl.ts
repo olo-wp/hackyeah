@@ -20,6 +20,7 @@ export const pl = {
   nav: {
     label: "Menu główne",
     search: "Szukaj miejsca",
+    contribute: "Pomóż innym",
     howItWorks: "Jak to działa",
     sources: "Źródła danych"
   },
@@ -196,6 +197,40 @@ export const pl = {
     cached: "z pamięci podręcznej",
     failed: "źródło niedostępne — użyto danych z pamięci podręcznej",
     not_applicable: "brak danych dla tego miejsca"
+  },
+
+  community: {
+    heading: "Pomóż innym — dodaj informacje",
+    intro:
+      "Odpowiedzi użytkowników są anonimowe i orientacyjne. Nie zastępują zweryfikowanych danych ze źródeł, ale pomagają innym osobom zaplanować wizytę.",
+    responses: "Liczba odpowiedzi",
+    noResponses: "Brak odpowiedzi — bądź pierwszą osobą, która odpowie.",
+    submit: "Wyślij odpowiedź",
+    submitting: "Wysyłanie…",
+    success: "Dziękujemy! Twoja odpowiedź została zapisana.",
+    error: "Nie udało się zapisać odpowiedzi. Spróbuj ponownie.",
+    topBadge: "najczęstsza odpowiedź",
+    answersHeading: "Odpowiedzi społeczności",
+    selectPrompt: "Wyszukaj miejsce, aby dodać swoje odpowiedzi.",
+    answerCta: "Dodaj odpowiedzi",
+    notFound: "Nie udało się wczytać tego miejsca. Spróbuj wyszukać je ponownie.",
+    features: {
+      accessible_parking: "Miejsce parkingowe dla osób z niepełnosprawnością",
+      accessible_toilet: "Dostępna toaleta",
+      step_free_entrance: "Wejście bez schodów",
+      ramp: "Podjazd",
+      elevator: "Winda",
+      doorstep: "Próg w wejściu"
+    },
+    answers: {
+      yes: "Tak",
+      no: "Nie"
+    },
+    doorstepLevels: {
+      none: "Brak progu",
+      small: "Niski próg",
+      high: "Wysoki próg"
+    }
   },
 
   footer: {

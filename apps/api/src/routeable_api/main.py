@@ -15,7 +15,7 @@ from slowapi.util import get_remote_address
 
 from .config import Settings, settings
 from .container import build_container
-from .routers import places, reports
+from .routers import community, places, reports
 
 logging.basicConfig(level=logging.INFO)
 
@@ -61,6 +61,7 @@ def create_app(app_settings: Settings | None = None) -> FastAPI:
 
     app.include_router(places.router)
     app.include_router(reports.router)
+    app.include_router(community.router)
 
     return app
 

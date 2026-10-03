@@ -9,12 +9,16 @@ export async function SearchResults({
   query,
   locale,
   dict,
-  preferences
+  preferences,
+  hrefForPlace,
+  linkLabel
 }: {
   query: string;
   locale: Locale;
   dict: Dictionary;
   preferences: string;
+  hrefForPlace?: (id: string) => string;
+  linkLabel?: string;
 }) {
   let result: PlaceSearchResult | null = null;
   let error: string | null = null;
@@ -42,8 +46,11 @@ export async function SearchResults({
     );
   }
 
-  const placeHref = (id: string) =>
-    `/${locale}/places/${encodeURIComponent(id)}${preferences ? `?${preferences}` : ""}`;
+  const placeHref =
+    hrefForPlace ??
+    ((id: string) =>
+      `/${locale}/places/${encodeURIComponent(id)}${preferences ? `?${preferences}` : ""}`);
+  const detailsLabel = linkLabel ?? dict.home.showDetails;
 
   return (
     <ul>
@@ -59,7 +66,7 @@ export async function SearchResults({
             {place.address ? ` · ${place.address}` : ""}
           </p>
           <Link href={placeHref(place.id)} className="link-kr mt-2 inline-block text-sm font-bold">
-            {dict.home.showDetails}
+            {detailsLabel}
             <span aria-hidden="true"> ▷</span>
           </Link>
         </li>

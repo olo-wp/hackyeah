@@ -1,5 +1,6 @@
 """Accessibility data intelligence: normalization, conflicts, confidence, preferences."""
 
+from .community import COMMUNITY_FRESH_WINDOW_DAYS, summarize_contributions
 from .confidence import (
     SOURCE_CONFIDENCE,
     calculate_confidence,
@@ -24,6 +25,7 @@ from .service import (
 from .store import EvidenceStore, InMemoryEvidenceStore
 
 __all__ = [
+    "COMMUNITY_FRESH_WINDOW_DAYS",
     "CROSS_FEATURE_RULES",
     "DEFAULT_STALE_AFTER_DAYS",
     "SOURCE_CONFIDENCE",
@@ -48,5 +50,6 @@ __all__ = [
     "resolve_feature",
     "resolve_features",
     "score_evidence",
+    "summarize_contributions",
     "to_confidence_level",
 ]

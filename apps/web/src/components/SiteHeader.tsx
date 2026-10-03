@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const nav = [
     { href: `/${locale}`, label: dict.nav.search },
+    { href: `/${locale}/contribute`, label: dict.nav.contribute },
     { href: `/${locale}#jak-to-dziala`, label: dict.nav.howItWorks },
     { href: `/${locale}#zrodla`, label: dict.nav.sources }
   ];
