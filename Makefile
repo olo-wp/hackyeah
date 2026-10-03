@@ -14,7 +14,7 @@ dev-web:
 	npm run dev
 
 migrate:
-	uv run routeable-migrate
+	uv run --env-file .env routeable-migrate
 
 test:
 	uv run pytest
