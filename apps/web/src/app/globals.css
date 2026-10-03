@@ -41,6 +41,20 @@
     line-height: 1.5;
   }
 
+  /* Explicit colours, not inherited ones: the high-contrast toggle has to be
+     able to override them and have the browser repaint the placeholder. */
+  input,
+  textarea,
+  select {
+    background-color: #fff;
+    color: var(--color-ink);
+  }
+
+  ::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+
   /* Keyboard focus must stay visible everywhere. */
   :focus-visible {
     outline: 3px solid #ffb300;
@@ -146,6 +160,18 @@ html[data-contrast="high"] .skip-link {
 }
 
 html[data-contrast="high"] .kr-heading {
+  color: #ffff00 !important;
+}
+
+html[data-contrast="high"] input,
+html[data-contrast="high"] textarea,
+html[data-contrast="high"] select {
+  background: #000 !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+
+html[data-contrast="high"] ::placeholder {
   color: #ffff00 !important;
 }
 
