@@ -16,8 +16,11 @@ COPY apps/mcp ./apps/mcp
 
 RUN uv sync --no-dev
 
+COPY --chmod=755 apps/api/entrypoint.sh /usr/local/bin/routeable-api-entrypoint
+
 RUN useradd --create-home --uid 10001 routeable
 USER routeable
 
 EXPOSE 3001
+ENTRYPOINT ["routeable-api-entrypoint"]
 CMD ["routeable-api"]

@@ -20,7 +20,7 @@ konflikty muszą być widoczne
 | --- | --- |
 | Backend (API, MCP, providery, silnik) | **Python 3.12**, FastAPI, Pydantic v2, httpx, psycopg 3 |
 | Frontend | **TypeScript**, Next.js 15 (App Router), Tailwind CSS |
-| Baza danych | PostgreSQL 16 |
+| Baza danych | Zewnętrzny PostgreSQL 18 |
 | Zarządzanie zależnościami | `uv` (workspace Pythona), `npm` (workspace frontendu) |
 
 ## Struktura repozytorium
@@ -75,18 +75,36 @@ npm run dev
 uv run routeable-mcp
 ```
 
-Z bazą danych:
+Z własną bazą PostgreSQL 18: ustaw w `.env` adres istniejącej bazy
+(login i hasło użytkownika PostgreSQL, nazwa bazy):
 
-```bash
-docker compose up postgres -d
-uv run routeable-migrate
+```env
+DATABASE_URL=postgresql://LOGIN:HASLO@34.158.225.184:5432/NAZWA_BAZY
 ```
 
-Albo całość w kontenerach:
+Znaki specjalne w loginie i haśle zakoduj jako URL, np. `@` → `%40`.
+Jeśli serwer wymaga TLS, dodaj do adresu `?sslmode=require`.
+Plik `.env` jest ignorowany przez Git.
+
+Migracje przy lokalnym uruchamianiu bez kontenerów:
 
 ```bash
-docker compose up --build
+uv run --env-file .env routeable-migrate
 ```
+
+Całość w kontenerach (Compose automatycznie odczytuje `.env`):
+
+```bash
+docker compose up --build -d
+docker compose logs -f api
+```
+
+Compose nie uruchamia lokalnego PostgreSQL. API i MCP korzystają z tego samego
+`DATABASE_URL`. Kontener API przy każdym starcie wykonuje `routeable-migrate`,
+a dopiero po powodzeniu uruchamia serwer. MCP czeka na gotowość API.
+Migracje wykonują się przy starcie kontenera, nie podczas budowania obrazu.
+Użytkownik bazy musi mieć uprawnienia do tworzenia tabel i indeksów w docelowym schemacie.
+Obecna migracja używa `CREATE TABLE/INDEX IF NOT EXISTS`, więc może być ponawiana.
 
 ## Polecenia
 

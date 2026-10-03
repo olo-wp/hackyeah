@@ -1,48 +1,35 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: routeable
-      POSTGRES_PASSWORD: routeable
-      POSTGRES_DB: routeable
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U routeable"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
-      DATABASE_URL: postgres://routeable:routeable@postgres:5432/routeable
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env to your external PostgreSQL connection URL}
       API_PORT: 3001
       USER_AGENT: "RouteAble/0.1 (hackyeah-2026)"
       CORS_ORIGINS: '["http://localhost:3000"]'
     ports:
       - "3001:3001"
-    depends_on:
-      postgres:
-        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3001/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   mcp:
     build:
       context: .
       dockerfile: apps/mcp/Dockerfile
     environment:
-      DATABASE_URL: postgres://routeable:routeable@postgres:5432/routeable
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env to your external PostgreSQL connection URL}
       MCP_TRANSPORT: http
       FASTMCP_HOST: 0.0.0.0
       FASTMCP_PORT: 3002
     ports:
       - "3002:3002"
     depends_on:
-      postgres:
+      api:
         condition: service_healthy
 
   web:
@@ -56,6 +43,3 @@ services:
       - "3000:3000"
     depends_on:
       - api
-
-volumes:
-  pgdata:
