@@ -6,7 +6,7 @@ export function SearchResultsLoading({ dict }: { dict: Dictionary }) {
     <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
       {/* `unoptimized` keeps the GIF animated — the image optimizer would flatten it. */}
       <Image
-        src="/smok-ladowanie.gif"
+        src="/img/smok-ladowanie.gif"
         alt={dict.home.loadingAlt}
         width={160}
         height={160}
