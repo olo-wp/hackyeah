@@ -31,7 +31,6 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
               <span className="block text-2xl font-bold leading-tight sm:text-3xl">
                 {dict.common.siteName}
               </span>
-              <span className="block text-sm">{dict.common.tagline}</span>
             </span>
           </Link>
         </div>
@@ -42,7 +41,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-block border-b-2 border-transparent py-1 font-bold hover:border-white"
+                  className="inline-block border-b-2 border-transparent py-1 text-lg font-bold hover:border-white"
                 >
                   {item.label}
                 </Link>
