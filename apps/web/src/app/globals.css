@@ -1,19 +1,153 @@
 @import "tailwindcss";
 
-:root {
-  color-scheme: light dark;
+/*
+ * Design tokens taken from the City of Kraków open data portal
+ * (otwartedane.um.krakow.pl): primary #0063AF, Lato, flat square blocks.
+ */
+@theme {
+  --color-krakow: #0063af;
+  --color-krakow-dark: #004f8c;
+  --color-krakow-darker: #003d6e;
+  --color-krakow-tint: #e8f1f8;
+  --color-ink: #212529;
+  --color-muted: #5b6770;
+  --color-rule: #d4dde4;
+
+  --font-sans: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
 }
 
-body {
-  @apply bg-white text-slate-900 antialiased;
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  /* Font-size switcher in the header (A A A), as on Polish public-sector portals. */
+  html[data-font-size="md"] {
+    font-size: 18px;
+  }
+
+  html[data-font-size="lg"] {
+    font-size: 20px;
+  }
+
+  body {
+    background-color: #fff;
+    color: var(--color-ink);
+    line-height: 1.5;
+  }
+
+  /* Keyboard focus must stay visible everywhere. */
+  :focus-visible {
+    outline: 3px solid #ffb300;
+    outline-offset: 2px;
+  }
 }
 
-/* Focus must stay visible for keyboard users. */
-:focus-visible {
-  outline: 3px solid #1d4ed8;
-  outline-offset: 2px;
+@layer components {
+  .container-kr {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  /* Flat square blocks — the portal uses no shadows and no rounded corners. */
+  .kr-band {
+    background-color: var(--color-krakow);
+    color: #fff;
+  }
+
+  .kr-card {
+    border: 1px solid var(--color-rule);
+    background: #fff;
+  }
+
+  .kr-card-blue {
+    background-color: var(--color-krakow);
+    color: #fff;
+  }
+
+  .kr-heading {
+    color: var(--color-krakow);
+    font-weight: 700;
+  }
+
+  .link-kr {
+    color: var(--color-krakow-dark);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .link-kr:hover {
+    color: var(--color-krakow-darker);
+  }
+
+  .kr-btn {
+    display: inline-block;
+    background-color: var(--color-krakow);
+    color: #fff;
+    font-weight: 700;
+    padding: 0.65rem 1.5rem;
+    border: 2px solid var(--color-krakow);
+  }
+
+  .kr-btn:hover {
+    background-color: var(--color-krakow-darker);
+    border-color: var(--color-krakow-darker);
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    z-index: 50;
+    transform: translateY(-150%);
+    background: #fff;
+    color: var(--color-krakow-dark);
+    padding: 0.75rem 1.25rem;
+    font-weight: 700;
+    border: 2px solid var(--color-krakow);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
 }
 
-.skip-link {
-  @apply absolute left-2 top-2 -translate-y-20 rounded bg-blue-700 px-4 py-2 text-white focus:translate-y-0;
+/*
+ * High-contrast theme (black/yellow) — the convention used by Polish
+ * public-sector sites. Uses !important so it wins over utility classes
+ * regardless of cascade layers.
+ */
+html[data-contrast="high"] body {
+  background: #000 !important;
+  color: #ffff00 !important;
+}
+
+html[data-contrast="high"] a,
+html[data-contrast="high"] button,
+html[data-contrast="high"] summary {
+  color: #ffff00 !important;
+}
+
+html[data-contrast="high"] .kr-band,
+html[data-contrast="high"] .kr-card,
+html[data-contrast="high"] .kr-card-blue,
+html[data-contrast="high"] .kr-btn,
+html[data-contrast="high"] .skip-link {
+  background: #000 !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+
+html[data-contrast="high"] .kr-heading {
+  color: #ffff00 !important;
+}
+
+html[data-contrast="high"] img:not(.kr-keep-colour) {
+  filter: grayscale(1) contrast(1.4);
 }
