@@ -1,11 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { SearchForm } from "@/components/SearchForm";
-import { format, getDictionary } from "@/i18n";
+import { SearchResults } from "@/components/SearchResults";
+import { SearchResultsLoading } from "@/components/SearchResultsLoading";
+import { getDictionary } from "@/i18n";
 import { isLocale } from "@/i18n/config";
-import { ApiError, searchPlaces } from "@/lib/api";
-import type { PlaceSearchResult } from "@/lib/types";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -42,24 +42,8 @@ export default async function HomePage({
   const dict = getDictionary(locale);
   const resolved = await searchParams;
   const query = readString(resolved, "q")?.trim() ?? "";
-
-  let result: PlaceSearchResult | null = null;
-  let error: string | null = null;
-
-  if (query.length >= 2) {
-    try {
-      result = await searchPlaces(query);
-    } catch (cause) {
-      error =
-        cause instanceof ApiError
-          ? format(dict.home.errorStatus, { status: cause.status })
-          : dict.home.errorConnection;
-    }
-  }
-
   const preferences = preferenceQuery(resolved);
-  const placeHref = (id: string) =>
-    `/${locale}/places/${encodeURIComponent(id)}${preferences ? `?${preferences}` : ""}`;
+  const hasQuery = query.length >= 2;
 
   const legend = [
     { icon: "✓", ...dict.home.legend.confirmed },
@@ -99,47 +83,19 @@ export default async function HomePage({
         <h2 className="kr-card-blue px-4 py-3 text-xl font-bold">{dict.home.resultsHeading}</h2>
 
         <div className="kr-card border-t-0">
-          {error ? (
-            <p className="border-l-4 border-[#8a4b00] bg-[#fdf0e0] px-4 py-3 text-[#8a4b00]">
-              {error}
-            </p>
-          ) : null}
-
-          {!error && query.length < 2 ? (
+          {hasQuery ? (
+            // `key` remounts the boundary on every new query so the GIF shows again.
+            <Suspense key={`${query}|${preferences}`} fallback={<SearchResultsLoading dict={dict} />}>
+              <SearchResults
+                query={query}
+                locale={locale}
+                dict={dict}
+                preferences={preferences}
+              />
+            </Suspense>
+          ) : (
             <p className="px-4 py-4 text-[var(--color-muted)]">{dict.home.emptyPrompt}</p>
-          ) : null}
-
-          {result && result.results.length === 0 ? (
-            <p className="px-4 py-4 text-[var(--color-muted)]">
-              {format(dict.home.noResults, { query })}
-            </p>
-          ) : null}
-
-          <ul>
-            {result?.results.map((place) => (
-              <li
-                key={place.id}
-                className="border-b border-[var(--color-rule)] px-4 py-4 last:border-b-0"
-              >
-                <h3 className="text-lg font-bold">
-                  <Link href={placeHref(place.id)} className="link-kr">
-                    {place.name}
-                  </Link>
-                </h3>
-                <p className="text-sm text-[var(--color-muted)]">
-                  {dict.categories[place.category] ?? place.category}
-                  {place.address ? ` · ${place.address}` : ""}
-                </p>
-                <Link
-                  href={placeHref(place.id)}
-                  className="link-kr mt-2 inline-block text-sm font-bold"
-                >
-                  {dict.home.showDetails}
-                  <span aria-hidden="true"> ▷</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          )}
         </div>
       </section>
 

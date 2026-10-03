@@ -15,7 +15,8 @@ export const en: Dictionary = {
     siteName: "RouteAble",
     tagline: "Kraków without barriers",
     skipToContent: "Skip to content",
-    logoAlt: "RouteAble logo — a dragon in a wheelchair against the Kraków skyline"
+    logoAlt: "RouteAble logo — a dragon in a wheelchair against the Kraków skyline",
+    krakowLogoAlt: "City of Kraków logo"
   },
 
   nav: {
@@ -44,21 +45,25 @@ export const en: Dictionary = {
     label: "Where do you want to go?",
     placeholder: "e.g. National Museum",
     submit: "Search",
-    requirementsLegend: "Your requirements",
+    requirementsLegend: "I need:",
     requirementsHint:
       "Requirements only highlight the information that matters to you. RouteAble never rules a place out because of them.",
     preferences: {
-      step_free_required: "I need a step-free entrance",
-      elevator_required: "I need a lift",
-      accessible_toilet_required: "I need an accessible toilet",
-      avoid_cobblestone: "I want to avoid cobblestones"
+      step_free_required: "a step-free entrance",
+      elevator_required: "a lift",
+      accessible_toilet_required: "an accessible toilet",
+      avoid_cobblestone: "a route without cobblestones"
     }
   },
 
   home: {
     title: "Check how accessible a place in Kraków is",
-    lead: "RouteAble does not label a place “accessible” or “not accessible”. It shows concrete barriers and facilities, and for every piece of information its source, the date it was checked and a confidence level — the decision stays yours.",
+    lead: "Find places and routes that match your needs. Check detailed accessibility information before you set off.",
     resultsHeading: "Search results",
+    loading: "Searching for places…",
+    loadingHint:
+      "We are querying OpenStreetMap, municipal data and venue websites — this may take a moment.",
+    loadingAlt: "Dragon on a scooter — search in progress",
     emptyPrompt: "Enter a place name to start searching.",
     noResults: "No places found for “{query}”.",
     errorStatus: "Could not load results ({status}).",

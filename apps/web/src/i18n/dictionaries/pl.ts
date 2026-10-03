@@ -13,7 +13,8 @@ export const pl = {
     siteName: "RouteAble",
     tagline: "Kraków bez barier",
     skipToContent: "Przejdź do treści",
-    logoAlt: "Logo RouteAble — smok na wózku na tle panoramy Krakowa"
+    logoAlt: "Logo RouteAble — smok na wózku na tle panoramy Krakowa",
+    krakowLogoAlt: "Logo Miasta Krakowa"
   },
 
   nav: {
@@ -42,21 +43,24 @@ export const pl = {
     label: "Gdzie chcesz się dostać?",
     placeholder: "np. Muzeum Narodowe",
     submit: "Szukaj",
-    requirementsLegend: "Twoje wymagania",
+    requirementsLegend: "Potrzebuję:",
     requirementsHint:
       "Wymagania służą wyłącznie do wyróżnienia istotnych informacji. RouteAble nie odrzuca na ich podstawie żadnego miejsca.",
     preferences: {
-      step_free_required: "Potrzebuję wejścia bez schodów",
-      elevator_required: "Potrzebuję windy",
-      accessible_toilet_required: "Potrzebuję dostępnej toalety",
-      avoid_cobblestone: "Chcę unikać kostki brukowej"
+      step_free_required: "wejścia bez schodów",
+      elevator_required: "windy",
+      accessible_toilet_required: "dostępnej toalety",
+      avoid_cobblestone: "trasy bez kostki brukowej"
     }
   },
 
   home: {
     title: "Sprawdź dostępność miejsca w Krakowie",
-    lead: "RouteAble nie ocenia miejsca jako „dostępne” lub „niedostępne”. Pokazuje konkretne bariery i udogodnienia, a przy każdej informacji źródło, datę sprawdzenia i poziom wiarygodności — decyzję podejmujesz samodzielnie.",
+    lead: "Znajdź miejsca i trasy dopasowane do swoich potrzeb. Sprawdź szczegółowe informacje o dostępności, zanim wyruszysz w drogę.",
     resultsHeading: "Wyniki wyszukiwania",
+    loading: "Szukam miejsc…",
+    loadingHint: "Odpytujemy OpenStreetMap, dane miejskie i strony obiektów — to może chwilę potrwać.",
+    loadingAlt: "Smok na hulajnodze — trwa wyszukiwanie",
     emptyPrompt: "Wpisz nazwę miejsca, aby rozpocząć wyszukiwanie.",
     noResults: "Nie znaleziono miejsc dla zapytania „{query}”.",
     errorStatus: "Nie udało się pobrać wyników ({status}).",
