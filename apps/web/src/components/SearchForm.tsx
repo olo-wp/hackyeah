@@ -42,7 +42,6 @@ export function SearchForm({
 
       <fieldset className="mt-6">
         <legend className="text-lg font-bold">{dict.search.requirementsLegend}</legend>
-        <p className="mt-1 text-sm text-[var(--color-muted)]">{dict.search.requirementsHint}</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {PREFERENCE_KEYS.map((key) => (
             <div key={key} className="flex items-center gap-3">
@@ -57,6 +56,7 @@ export function SearchForm({
             </div>
           ))}
         </div>
+        <p className="mt-3 text-sm text-[var(--color-muted)]">{dict.search.requirementsHint}</p>
       </fieldset>
     </form>
   );

@@ -17,15 +17,16 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
     <header className="kr-band">
       <div className="container-kr">
         <div className="flex flex-col items-center gap-3 pt-5 sm:flex-row sm:justify-center">
-          <Link href={`/${locale}`} className="flex items-center gap-3">
+          <Link href={`/${locale}`} className="flex items-center gap-4">
             <Image
-              src="/logo.png"
-              alt=""
-              width={64}
-              height={64}
+              src="/krakow-logo.png"
+              alt={dict.common.krakowLogoAlt}
+              width={180}
+              height={60}
               priority
-              className="kr-keep-colour bg-white p-1"
+              className="kr-keep-colour h-12 w-auto sm:h-14"
             />
+            <span className="h-12 w-px bg-white/50" aria-hidden="true" />
             <span className="text-left">
               <span className="block text-2xl font-bold leading-tight sm:text-3xl">
                 {dict.common.siteName}
