@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FeatureGroup } from "@/components/FeatureGroup";
-import { ProviderStatusList } from "@/components/ProviderStatusList";
 import { getDictionary } from "@/i18n";
 import { isLocale } from "@/i18n/config";
 import { ApiError, getPlaceAccessibility } from "@/lib/api";
@@ -48,7 +47,7 @@ export default async function PlacePage({
     throw cause;
   }
 
-  const { place, profile, preference_evaluation: evaluations, provider_status: providers } = data;
+  const { place, profile, preference_evaluation: evaluations } = data;
   const labels = dict.features;
 
   return (
@@ -139,8 +138,6 @@ export default async function PlacePage({
           }
         ]}
       />
-
-      <ProviderStatusList statuses={providers} dict={dict} />
     </>
   );
 }
