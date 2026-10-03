@@ -6,7 +6,10 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env to your external PostgreSQL connection URL}
       API_PORT: 3001
-      USER_AGENT: "RouteAble/0.1 (hackyeah-2026)"
+      NOMINATIM_URL: ${NOMINATIM_URL}
+      OSM_OVERPASS_URL: ${OSM_OVERPASS_URL}
+      USER_AGENT: ${USER_AGENT}
+      WEB_PROVIDER_TIMEOUT_MS: ${WEB_PROVIDER_TIMEOUT_MS:-35000}
       CORS_ORIGINS: '["http://localhost:3000"]'
     ports:
       - "3001:3001"
