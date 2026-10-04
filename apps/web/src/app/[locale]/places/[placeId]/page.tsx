@@ -112,6 +112,7 @@ export default async function PlacePage({
       <FeatureGroup
         title={dict.groups.entrance}
         dict={dict}
+        community={community ?? undefined}
         features={[
           { label: labels.step_free_entrance, feature: profile.entrance.step_free },
           { label: labels.entrance_steps, feature: profile.entrance.steps },
@@ -124,6 +125,7 @@ export default async function PlacePage({
       <FeatureGroup
         title={dict.groups.interior}
         dict={dict}
+        community={community ?? undefined}
         features={[
           { label: labels.elevator, feature: profile.interior.elevator },
           { label: labels.interior_stairs, feature: profile.interior.stairs }
@@ -133,6 +135,7 @@ export default async function PlacePage({
       <FeatureGroup
         title={dict.groups.facilities}
         dict={dict}
+        community={community ?? undefined}
         features={[
           { label: labels.accessible_toilet, feature: profile.facilities.accessible_toilet },
           { label: labels.seating, feature: profile.facilities.seating }
@@ -142,6 +145,7 @@ export default async function PlacePage({
       <FeatureGroup
         title={dict.groups.surroundings}
         dict={dict}
+        community={community ?? undefined}
         features={[
           { label: labels.surface, feature: profile.surroundings.surface },
           { label: labels.curb, feature: profile.surroundings.curb },
@@ -153,14 +157,7 @@ export default async function PlacePage({
       />
       <RoutePlanner place={place} dict={dict} />
 
-      {community ? (
-        <CommunityAnswers
-          locale={locale}
-          placeId={place.id}
-          summary={community}
-          dict={dict.community}
-        />
-      ) : null}
+      <CommunityAnswers locale={locale} placeId={place.id} dict={dict.community} />
     </>
   );
 }

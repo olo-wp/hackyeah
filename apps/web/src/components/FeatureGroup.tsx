@@ -1,5 +1,11 @@
 import type { Dictionary } from "@/i18n";
-import type { AccessibilityFeature } from "@/lib/types";
+import { communityChoices, communityValueKey } from "@/lib/community";
+import type {
+  AccessibilityFeature,
+  CommunityFeatureKey,
+  CommunityFeatureSummary,
+  CommunitySummary
+} from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 
 type Surfaces = Dictionary["surfaces"];
@@ -19,11 +25,13 @@ function renderValue(feature: AccessibilityFeature, dict: Dictionary): string {
 export function FeatureRow({
   label,
   feature,
-  dict
+  dict,
+  community
 }: {
   label: string;
   feature: AccessibilityFeature;
   dict: Dictionary;
+  community?: CommunityFeatureSummary;
 }) {
   const formatDate = (value: string) => new Date(value).toLocaleDateString(dict.localeTag);
 
@@ -85,6 +93,33 @@ export function FeatureRow({
       ) : (
         <p className="mt-2 text-sm text-[var(--color-muted)]">{dict.place.noSources}</p>
       )}
+
+      {community && community.total_responses > 0 ? (
+        <div className="kr-card mt-3 bg-[#eef1f3] px-3 py-2">
+          <p className="text-sm font-bold text-[var(--color-muted)]">
+            {dict.community.answersHeading}
+          </p>
+          <ul className="mt-1 flex flex-wrap gap-2">
+            {communityChoices(feature.key as CommunityFeatureKey, dict)
+              .filter((choice) => (community.distribution[choice.key] ?? 0) > 0)
+              .map((choice) => {
+                const isTop =
+                  community.top_value !== null &&
+                  communityValueKey(community.top_value) === choice.key;
+                return (
+                  <li
+                    key={choice.key}
+                    className={`border border-[var(--color-rule)] bg-white px-2 py-0.5 text-sm ${
+                      isTop ? "font-bold" : "text-[var(--color-muted)]"
+                    }`}
+                  >
+                    {choice.label}: {community.distribution[choice.key] ?? 0}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      ) : null}
     </li>
   );
 }
@@ -92,18 +127,26 @@ export function FeatureRow({
 export function FeatureGroup({
   title,
   features,
-  dict
+  dict,
+  community
 }: {
   title: string;
   features: Array<{ label: string; feature: AccessibilityFeature }>;
   dict: Dictionary;
+  community?: CommunitySummary;
 }) {
   return (
     <section className="mt-8">
       <h2 className="kr-card-blue px-4 py-3 text-xl font-bold">{title}</h2>
       <ul className="kr-card border-t-0">
         {features.map(({ label, feature }) => (
-          <FeatureRow key={feature.key} label={label} feature={feature} dict={dict} />
+          <FeatureRow
+            key={feature.key}
+            label={label}
+            feature={feature}
+            dict={dict}
+            community={community?.features.find((f) => f.feature_key === feature.key)}
+          />
         ))}
       </ul>
     </section>

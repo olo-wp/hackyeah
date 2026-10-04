@@ -7,7 +7,6 @@ from typing import Protocol
 from routeable_model import (
     AccessibilityReport,
     CommunityContribution,
-    CommunityFeatureKey,
     Evidence,
     FeatureKey,
     Place,
@@ -46,7 +45,7 @@ class EvidenceStore(Protocol):
     async def get_community_contributions(
         self,
         place_id: str,
-        feature_key: CommunityFeatureKey | None = None,
+        feature_key: FeatureKey | None = None,
         since: datetime | None = None,
     ) -> list[CommunityContribution]: ...
 
@@ -111,7 +110,7 @@ class InMemoryEvidenceStore:
     async def get_community_contributions(
         self,
         place_id: str,
-        feature_key: CommunityFeatureKey | None = None,
+        feature_key: FeatureKey | None = None,
         since: datetime | None = None,
     ) -> list[CommunityContribution]:
         items = [c for c in self._community if c.place_id == place_id]

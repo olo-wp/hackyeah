@@ -48,20 +48,33 @@ def test_submit_boolean_contribution(ctx: tuple[TestClient, InMemoryEvidenceStor
     assert body["submitted_at"]
 
 
-def test_submit_doorstep_contribution(ctx: tuple[TestClient, InMemoryEvidenceStore]) -> None:
+def test_submit_threshold_contribution(ctx: tuple[TestClient, InMemoryEvidenceStore]) -> None:
     client, store = ctx
     _save_place(store)
 
     response = client.post(
         "/api/places/krakow:test/community",
-        json={"feature_key": "doorstep", "value": "small"},
+        json={"feature_key": "threshold_cm", "value": "small"},
     )
 
     assert response.status_code == 202
     assert response.json()["value"] == "small"
 
 
-def test_boolean_feature_rejects_doorstep_value(
+def test_submit_surface_contribution(ctx: tuple[TestClient, InMemoryEvidenceStore]) -> None:
+    client, store = ctx
+    _save_place(store)
+
+    response = client.post(
+        "/api/places/krakow:test/community",
+        json={"feature_key": "surface", "value": "cobblestone"},
+    )
+
+    assert response.status_code == 202
+    assert response.json()["value"] == "cobblestone"
+
+
+def test_boolean_feature_rejects_string_value(
     ctx: tuple[TestClient, InMemoryEvidenceStore],
 ) -> None:
     client, store = ctx
@@ -75,7 +88,7 @@ def test_boolean_feature_rejects_doorstep_value(
     assert response.status_code == 422
 
 
-def test_doorstep_feature_rejects_boolean_value(
+def test_threshold_feature_rejects_boolean_value(
     ctx: tuple[TestClient, InMemoryEvidenceStore],
 ) -> None:
     client, store = ctx
@@ -83,7 +96,7 @@ def test_doorstep_feature_rejects_boolean_value(
 
     response = client.post(
         "/api/places/krakow:test/community",
-        json={"feature_key": "doorstep", "value": True},
+        json={"feature_key": "threshold_cm", "value": True},
     )
 
     assert response.status_code == 422
@@ -109,14 +122,14 @@ def test_summary_reflects_counts(ctx: tuple[TestClient, InMemoryEvidenceStore]) 
     for value in ("small", "small", "high"):
         client.post(
             "/api/places/krakow:test/community",
-            json={"feature_key": "doorstep", "value": value},
+            json={"feature_key": "threshold_cm", "value": value},
         )
 
     response = client.get("/api/places/krakow:test/community")
 
     assert response.status_code == 200
     summary = response.json()
-    doorstep = next(f for f in summary["features"] if f["feature_key"] == "doorstep")
-    assert doorstep["total_responses"] == 3
-    assert doorstep["distribution"] == {"small": 2, "high": 1}
-    assert doorstep["top_value"] == "small"
+    threshold = next(f for f in summary["features"] if f["feature_key"] == "threshold_cm")
+    assert threshold["total_responses"] == 3
+    assert threshold["distribution"] == {"small": 2, "high": 1}
+    assert threshold["top_value"] == "small"

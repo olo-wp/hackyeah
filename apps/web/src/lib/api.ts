@@ -3,7 +3,7 @@ import type {
   GeoLocation,
   CommunityFeatureKey,
   CommunitySummary,
-  DoorstepLevel,
+  CommunityValue,
   PlaceAccessibilityResult,
   PlaceSearchResult,
   RouteOrigin,
@@ -80,7 +80,7 @@ export function getCommunitySummary(placeId: string): Promise<CommunitySummary> 
 export async function postCommunityContribution(
   placeId: string,
   featureKey: CommunityFeatureKey,
-  value: boolean | DoorstepLevel
+  value: CommunityValue
 ): Promise<void> {
   const response = await fetch(`${API_URL}/api/places/${encodeURIComponent(placeId)}/community`, {
     method: "POST",

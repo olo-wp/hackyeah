@@ -231,27 +231,30 @@ export const pl = {
     submitting: "Wysyłanie…",
     success: "Dziękujemy! Twoja odpowiedź została zapisana.",
     error: "Nie udało się zapisać odpowiedzi. Spróbuj ponownie.",
+    alreadyAnswered: "W tej sesji odpowiedziałeś/aś już na to pytanie.",
     topBadge: "najczęstsza odpowiedź",
     answersHeading: "Odpowiedzi społeczności",
     selectPrompt: "Wyszukaj miejsce, aby dodać swoje odpowiedzi.",
     answerCta: "Dodaj odpowiedzi",
     notFound: "Nie udało się wczytać tego miejsca. Spróbuj wyszukać je ponownie.",
-    features: {
-      accessible_parking: "Miejsce parkingowe dla osób z niepełnosprawnością",
-      accessible_toilet: "Dostępna toaleta",
-      step_free_entrance: "Wejście bez schodów",
-      ramp: "Podjazd",
-      elevator: "Winda",
-      doorstep: "Próg w wejściu"
-    },
     answers: {
       yes: "Tak",
       no: "Nie"
     },
-    doorstepLevels: {
+    steps: {
+      none: "Brak stopni",
+      few: "1–2 stopnie",
+      some: "3–5 stopni",
+      many: "6+ stopni"
+    },
+    threshold: {
       none: "Brak progu",
       small: "Niski próg",
       high: "Wysoki próg"
+    },
+    doorWidth: {
+      narrow: "Wąskie wejście",
+      wide: "Szerokie wejście"
     }
   },
 

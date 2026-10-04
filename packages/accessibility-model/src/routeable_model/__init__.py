@@ -1,12 +1,11 @@
 """RouteAble shared accessibility model."""
 
 from .community import (
+    COMMUNITY_FEATURE_OPTIONS,
     CommunityAnswer,
     CommunityContribution,
-    CommunityFeatureKey,
     CommunityFeatureSummary,
     CommunitySummary,
-    DoorstepLevel,
     NewCommunityContribution,
 )
 from .evidence import Evidence, RawAccessibilityEvidence, VerificationStatus
@@ -43,18 +42,17 @@ from .reports import (
 from .source import DataSource, SourceType
 
 __all__ = [
+    "COMMUNITY_FEATURE_OPTIONS",
     "AccessibilityFeature",
     "AccessibilityPreferences",
     "AccessibilityProfile",
     "AccessibilityReport",
     "CommunityAnswer",
     "CommunityContribution",
-    "CommunityFeatureKey",
     "CommunityFeatureSummary",
     "CommunitySummary",
     "ConfidenceLevel",
     "DataSource",
-    "DoorstepLevel",
     "EntranceFeatures",
     "Evidence",
     "ExternalIds",

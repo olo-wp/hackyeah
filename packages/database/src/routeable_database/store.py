@@ -8,7 +8,6 @@ from psycopg_pool import AsyncConnectionPool
 from routeable_model import (
     AccessibilityReport,
     CommunityContribution,
-    CommunityFeatureKey,
     DataSource,
     Evidence,
     ExternalIds,
@@ -272,7 +271,7 @@ class PostgresEvidenceStore:
     async def get_community_contributions(
         self,
         place_id: str,
-        feature_key: CommunityFeatureKey | None = None,
+        feature_key: FeatureKey | None = None,
         since: datetime | None = None,
     ) -> list[CommunityContribution]:
         async with self._pool.connection() as conn:

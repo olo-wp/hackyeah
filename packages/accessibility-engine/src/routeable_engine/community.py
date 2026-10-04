@@ -4,24 +4,23 @@ from collections import Counter
 
 from routeable_model import (
     CommunityContribution,
-    CommunityFeatureKey,
     CommunityFeatureSummary,
     CommunitySummary,
-    DoorstepLevel,
+    FeatureKey,
 )
 
 # Answers older than this are dropped before aggregation (applied by the service).
 COMMUNITY_FRESH_WINDOW_DAYS = 180
 
 
-def _value_key(value: bool | DoorstepLevel) -> str:
+def _value_key(value: bool | str) -> str:
     if isinstance(value, bool):
         return "true" if value else "false"
-    return value.value
+    return value
 
 
 def _summarize_feature(
-    feature_key: CommunityFeatureKey, contributions: list[CommunityContribution]
+    feature_key: FeatureKey, contributions: list[CommunityContribution]
 ) -> CommunityFeatureSummary:
     if not contributions:
         return CommunityFeatureSummary(feature_key=feature_key)
@@ -31,7 +30,7 @@ def _summarize_feature(
     ranked = counts.most_common()
 
     # A single most-common answer only; ties leave `top_value` unset.
-    top_value: bool | DoorstepLevel | None = None
+    top_value: bool | str | None = None
     if len(ranked) == 1 or ranked[0][1] > ranked[1][1]:
         winner = ranked[0][0]
         top_value = next(c.value for c in newest_first if _value_key(c.value) == winner)
@@ -50,13 +49,11 @@ def _summarize_feature(
 def summarize_contributions(
     place_id: str, contributions: list[CommunityContribution]
 ) -> CommunitySummary:
-    grouped: dict[CommunityFeatureKey, list[CommunityContribution]] = {
-        key: [] for key in CommunityFeatureKey
-    }
+    grouped: dict[FeatureKey, list[CommunityContribution]] = {key: [] for key in FeatureKey}
     for contribution in contributions:
         grouped[contribution.feature_key].append(contribution)
 
     return CommunitySummary(
         place_id=place_id,
-        features=[_summarize_feature(key, grouped[key]) for key in CommunityFeatureKey],
+        features=[_summarize_feature(key, grouped[key]) for key in FeatureKey],
     )

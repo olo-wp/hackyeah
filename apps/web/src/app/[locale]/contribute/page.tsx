@@ -77,7 +77,7 @@ export default async function ContributePage({
           locale={locale}
           placeId={selected.id}
           summary={selected.summary}
-          dict={dict.community}
+          dict={dict}
           title={selected.name}
         />
       ) : selectionFailed ? (

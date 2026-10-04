@@ -131,17 +131,21 @@ export interface AccessibilityPreferences {
   min_door_width_cm?: number;
 }
 
-export type DoorstepLevel = "none" | "small" | "high";
-
 export type CommunityFeatureKey =
-  | "accessible_parking"
-  | "accessible_toilet"
   | "step_free_entrance"
+  | "entrance_steps"
   | "ramp"
+  | "threshold_cm"
+  | "door_width_cm"
   | "elevator"
-  | "doorstep";
+  | "interior_stairs"
+  | "accessible_toilet"
+  | "seating"
+  | "surface"
+  | "curb"
+  | "accessible_parking";
 
-export type CommunityValue = boolean | DoorstepLevel;
+export type CommunityValue = boolean | string;
 
 export interface CommunityFeatureSummary {
   feature_key: CommunityFeatureKey;

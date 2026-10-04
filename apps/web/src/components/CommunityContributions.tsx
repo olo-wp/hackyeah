@@ -1,40 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
 import type { Dictionary } from "@/i18n";
 import { submitCommunityContribution } from "@/lib/actions";
-import type {
-  CommunityFeatureKey,
-  CommunityFeatureSummary,
-  CommunitySummary,
-  CommunityValue,
-  DoorstepLevel
-} from "@/lib/types";
-
-type CommunityDict = Dictionary["community"];
-
-const DOORSTEP_LEVELS: DoorstepLevel[] = ["none", "small", "high"];
-
-type Choice = { key: string; label: string; value: CommunityValue };
-
-function choicesFor(featureKey: CommunityFeatureKey, dict: CommunityDict): Choice[] {
-  if (featureKey === "doorstep") {
-    return DOORSTEP_LEVELS.map((level) => ({
-      key: level,
-      label: dict.doorstepLevels[level],
-      value: level
-    }));
-  }
-  return [
-    { key: "true", label: dict.answers.yes, value: true },
-    { key: "false", label: dict.answers.no, value: false }
-  ];
-}
-
-function valueKey(value: CommunityValue): string {
-  if (typeof value === "boolean") return value ? "true" : "false";
-  return value;
-}
+import { communityChoices, communityValueKey } from "@/lib/community";
+import type { CommunityFeatureSummary, CommunitySummary } from "@/lib/types";
 
 function CommunityQuestion({
   locale,
@@ -45,16 +15,24 @@ function CommunityQuestion({
   locale: string;
   placeId: string;
   feature: CommunityFeatureSummary;
-  dict: CommunityDict;
+  dict: Dictionary;
 }) {
-  const choices = choicesFor(feature.feature_key, dict);
+  const c = dict.community;
+  const choices = communityChoices(feature.feature_key, dict);
   const [selected, setSelected] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
+  const [answered, setAnswered] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const topKey = feature.top_value !== null ? valueKey(feature.top_value) : null;
-  const groupName = `community-${feature.feature_key}`;
+  const topKey = feature.top_value !== null ? communityValueKey(feature.top_value) : null;
+  const groupName = useId();
+  // One answer per browser session, kept anonymous (no server-side identity).
+  const storageKey = `routeable:community:${placeId}:${feature.feature_key}`;
+
+  useEffect(() => {
+    setAnswered(sessionStorage.getItem(storageKey) !== null);
+  }, [storageKey]);
 
   function handleSubmit() {
     const choice = choices.find((item) => item.key === selected);
@@ -62,12 +40,14 @@ function CommunityQuestion({
     startTransition(async () => {
       try {
         await submitCommunityContribution(locale, placeId, feature.feature_key, choice.value);
+        sessionStorage.setItem(storageKey, choice.key);
         setIsError(false);
-        setStatus(dict.success);
+        setStatus(c.success);
         setSelected(null);
+        setAnswered(true);
       } catch {
         setIsError(true);
-        setStatus(dict.error);
+        setStatus(c.error);
       }
     });
   }
@@ -89,7 +69,7 @@ function CommunityQuestion({
               value={choice.key}
               checked={selected === choice.key}
               onChange={() => setSelected(choice.key)}
-              disabled={isPending}
+              disabled={isPending || answered}
               className="h-5 w-5 accent-[#0064b6]"
             />
             <span>{choice.label}</span>
@@ -101,15 +81,19 @@ function CommunityQuestion({
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={selected === null || isPending}
+          disabled={selected === null || isPending || answered}
           className="kr-btn disabled:opacity-50"
         >
-          {isPending ? dict.submitting : dict.submit}
+          {isPending ? c.submitting : c.submit}
         </button>
         <span className="text-sm text-[var(--color-muted)]">
-          {dict.responses}: {feature.total_responses}
+          {c.responses}: {feature.total_responses}
         </span>
       </div>
+
+      {answered ? (
+        <p className="mt-2 text-sm text-[var(--color-muted)]">{c.alreadyAnswered}</p>
+      ) : null}
 
       {feature.total_responses > 0 ? (
         <ul className="mt-3 flex flex-wrap gap-2">
@@ -124,13 +108,13 @@ function CommunityQuestion({
                 }`}
               >
                 {choice.label}: {count}
-                {isTop ? ` · ${dict.topBadge}` : ""}
+                {isTop ? ` · ${c.topBadge}` : ""}
               </li>
             );
           })}
         </ul>
       ) : (
-        <p className="mt-3 text-sm text-[var(--color-muted)]">{dict.noResponses}</p>
+        <p className="mt-3 text-sm text-[var(--color-muted)]">{c.noResponses}</p>
       )}
 
       <p
@@ -154,7 +138,7 @@ export function CommunityContributions({
   locale: string;
   placeId: string;
   summary: CommunitySummary;
-  dict: CommunityDict;
+  dict: Dictionary;
   title: string;
 }) {
   return (

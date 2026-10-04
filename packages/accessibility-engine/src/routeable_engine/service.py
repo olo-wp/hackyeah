@@ -131,17 +131,23 @@ class AccessibilityService:
         for place in places:
             await self._store.save_place(place)
 
-        # Previously ingested places keep search usable when an upstream source is down.
-        if len(places) < options.limit:
-            kept = [_to_external_place(place) for place in places]
-            for stored in await self._store.search_places(query, options.limit):
-                if len(places) >= options.limit:
-                    break
-                external = _to_external_place(stored)
-                if any(is_same_place(external, other) for other in kept):
-                    continue
-                kept.append(external)
+        # A curated store match (city dataset) replaces a live duplicate so the id that
+        # carries the seeded evidence wins; remaining matches fill free slots and keep
+        # search usable when an upstream source is down.
+        externals = [_to_external_place(place) for place in places]
+        for stored in await self._store.search_places(query, options.limit):
+            external = _to_external_place(stored)
+            duplicate = next(
+                (i for i, other in enumerate(externals) if is_same_place(external, other)),
+                None,
+            )
+            if duplicate is not None:
+                if _is_curated(stored) and not _is_curated(places[duplicate]):
+                    places[duplicate] = stored
+                    externals[duplicate] = external
+            elif len(places) < options.limit:
                 places.append(stored)
+                externals.append(external)
 
         return PlaceSearchResult(results=places, provider_status=provider_status)
 
@@ -289,6 +295,11 @@ class AccessibilityService:
     def _is_fresh(self, timestamp: datetime) -> bool:
         reference = timestamp if timestamp.tzinfo else timestamp.replace(tzinfo=UTC)
         return self._now() - reference < self._cache_ttl
+
+
+def _is_curated(place: Place) -> bool:
+    """City-dataset places carry the curated, seeded accessibility evidence."""
+    return place.external_ids.city_dataset is not None
 
 
 def _to_place(provider: AccessibilityProvider, external: ExternalPlace) -> Place:

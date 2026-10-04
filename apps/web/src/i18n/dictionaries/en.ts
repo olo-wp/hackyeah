@@ -234,27 +234,30 @@ export const en: Dictionary = {
     submitting: "Sending…",
     success: "Thank you! Your answer has been saved.",
     error: "We could not save your answer. Please try again.",
+    alreadyAnswered: "You have already answered this in this session.",
     topBadge: "most common answer",
     answersHeading: "Community answers",
     selectPrompt: "Search for a place to add your answers.",
     answerCta: "Add your answers",
     notFound: "We couldn't load that place. Try searching for it again.",
-    features: {
-      accessible_parking: "Accessible parking space",
-      accessible_toilet: "Accessible toilet",
-      step_free_entrance: "Step-free entrance",
-      ramp: "Ramp",
-      elevator: "Lift",
-      doorstep: "Doorstep at the entrance"
-    },
     answers: {
       yes: "Yes",
       no: "No"
     },
-    doorstepLevels: {
-      none: "No doorstep",
-      small: "Small doorstep",
-      high: "High doorstep"
+    steps: {
+      none: "No steps",
+      few: "1–2 steps",
+      some: "3–5 steps",
+      many: "6+ steps"
+    },
+    threshold: {
+      none: "No threshold",
+      small: "Small threshold",
+      high: "High threshold"
+    },
+    doorWidth: {
+      narrow: "Narrow entrance",
+      wide: "Wide entrance"
     }
   },
 
