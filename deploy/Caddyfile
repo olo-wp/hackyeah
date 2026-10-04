@@ -1,0 +1,9 @@
+routeable.net {
+    encode zstd gzip
+    reverse_proxy web:3000
+}
+
+api.routeable.net {
+    encode zstd gzip
+    reverse_proxy api:3001
+}

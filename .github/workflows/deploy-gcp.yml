@@ -1,0 +1,92 @@
+name: Deploy to GCP VM
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: routeable-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production
+    env:
+      RELEASE: ${{ github.sha }}
+      SSH_HOST: 34.118.126.240
+      SSH_USER: ubuntu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: routeable/api:${{ github.sha }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+      - name: Build MCP
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/mcp/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: routeable/mcp:${{ github.sha }}
+          cache-from: type=gha,scope=mcp
+          cache-to: type=gha,mode=max,scope=mcp
+
+      - name: Build web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: routeable/web:${{ github.sha }}
+          build-args: |
+            ROUTEABLE_API_URL=http://api:3001
+            NEXT_PUBLIC_MAPTILER_KEY=${{ vars.NEXT_PUBLIC_MAPTILER_KEY }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+      - name: Configure SSH
+        env:
+          SSHPASS: ${{ secrets.GCP_SSH_PASSWORD }}
+          SSH_KNOWN_HOSTS: ${{ secrets.GCP_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_USER"
+          test -n "$SSHPASS"
+          test -n "$SSH_KNOWN_HOSTS"
+          sudo apt-get update -qq
+          sudo apt-get install -y sshpass
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          printf 'Host 34.118.126.240\n  PreferredAuthentications password\n  PubkeyAuthentication no\n  NumberOfPasswordPrompts 1\n  StrictHostKeyChecking yes\n  ConnectTimeout 15\n' > ~/.ssh/config
+
+      - name: Transfer and deploy
+        env:
+          SSHPASS: ${{ secrets.GCP_SSH_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker save "routeable/api:$RELEASE" "routeable/mcp:$RELEASE" "routeable/web:$RELEASE" | gzip > images.tar.gz
+          sshpass -e ssh "$SSH_USER@$SSH_HOST" "umask 077; mkdir -p routeable/releases/$RELEASE"
+          sshpass -e scp images.tar.gz deploy/compose.yml deploy/Caddyfile deploy/deploy.sh "$SSH_USER@$SSH_HOST:routeable/releases/$RELEASE/"
+          sshpass -e ssh "$SSH_USER@$SSH_HOST" "bash routeable/releases/$RELEASE/deploy.sh $RELEASE"
+
+      - name: Remove SSH credentials
+        if: always()
+        run: rm -f ~/.ssh/known_hosts ~/.ssh/config

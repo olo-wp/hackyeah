@@ -1,0 +1,72 @@
+name: routeable
+
+services:
+  api:
+    image: routeable/api:${RELEASE:?Set RELEASE to the deployed commit SHA}
+    restart: unless-stopped
+    env_file: ${ROUTEABLE_ENV_FILE:-./.env}
+    environment:
+      API_PORT: 3001
+      CORS_ORIGINS: '["https://routeable.net"]'
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3001/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  mcp:
+    image: routeable/mcp:${RELEASE:?Set RELEASE to the deployed commit SHA}
+    restart: unless-stopped
+    env_file: ${ROUTEABLE_ENV_FILE:-./.env}
+    environment:
+      MCP_TRANSPORT: http
+      FASTMCP_HOST: 0.0.0.0
+      FASTMCP_PORT: 3002
+    # Access over an SSH tunnel; public MCP needs a separate authentication setup.
+    ports:
+      - "127.0.0.1:3002:3002"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import socket; socket.create_connection(('127.0.0.1', 3002), timeout=3).close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  web:
+    image: routeable/web:${RELEASE:?Set RELEASE to the deployed commit SHA}
+    restart: unless-stopped
+    environment:
+      ROUTEABLE_API_URL: http://api:3001
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:

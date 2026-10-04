@@ -240,5 +240,6 @@ i [structured outputs](https://ai.google.dev/gemini-api/docs/generate-content/st
 
 ## Dokumentacja
 
+- [deploy/README.md](deploy/README.md) — GitHub Actions, GCP VM i reverse proxy HTTPS
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — architektura techniczna
 - [docs/MVP_PLAN.md](docs/MVP_PLAN.md) — zakres i scenariusze MVP
