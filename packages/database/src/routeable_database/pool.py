@@ -19,5 +19,6 @@ def create_pool(database_url: str | None = None, max_size: int = 10) -> AsyncCon
         conninfo=resolve_database_url(database_url),
         max_size=max_size,
         open=False,
+        check=AsyncConnectionPool.check_connection,
         kwargs={"row_factory": dict_row},
     )
