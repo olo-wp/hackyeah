@@ -155,7 +155,6 @@ export function RoutePlanner({ place, dict }: { place: Place; dict: Dictionary }
       <div className="border border-t-0 border-[var(--color-rule)]">
         <div className="grid gap-5 p-4 md:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] md:p-5">
           <div className="space-y-4">
-            <p className="border-l-4 border-[#b34025] pl-3 text-sm">{dict.route.disclaimer}</p>
             <button type="button" onClick={useCurrentLocation} disabled={routing || searching} className="kr-btn">
               {dict.route.currentLocation}
             </button>

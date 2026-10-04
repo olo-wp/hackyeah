@@ -4,6 +4,7 @@ import type {
   CommunityFeatureKey,
   CommunitySummary,
   CommunityValue,
+  Place,
   PlaceAccessibilityResult,
   PlaceSearchResult,
   RouteOrigin,
@@ -38,6 +39,10 @@ async function get<T>(path: string, params: Record<string, string> = {}): Promis
 
 export function searchPlaces(query: string, city = "Kraków"): Promise<PlaceSearchResult> {
   return get<PlaceSearchResult>("/api/places/search", { q: query, city });
+}
+
+export function getPlace(placeId: string): Promise<Place> {
+  return get<Place>(`/api/places/${encodeURIComponent(placeId)}`);
 }
 
 export function getPlaceAccessibility(

@@ -7,7 +7,7 @@ import { SearchResults } from "@/components/SearchResults";
 import { SearchResultsLoading } from "@/components/SearchResultsLoading";
 import { getDictionary } from "@/i18n";
 import { isLocale } from "@/i18n/config";
-import { getCommunitySummary, getPlaceAccessibility } from "@/lib/api";
+import { getCommunitySummary, getPlace } from "@/lib/api";
 import type { CommunitySummary } from "@/lib/types";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -39,11 +39,11 @@ export default async function ContributePage({
   if (placeId) {
     const id = decodeURIComponent(placeId);
     const [place, summary] = await Promise.allSettled([
-      getPlaceAccessibility(id),
+      getPlace(id),
       getCommunitySummary(id)
     ]);
     if (place.status === "fulfilled" && summary.status === "fulfilled") {
-      selected = { id, name: place.value.place.name, summary: summary.value };
+      selected = { id, name: place.value.name, summary: summary.value };
     } else {
       selectionFailed = true;
     }

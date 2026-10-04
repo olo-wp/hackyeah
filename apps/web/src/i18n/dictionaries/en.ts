@@ -123,7 +123,6 @@ export const en: Dictionary = {
 
   route: {
     heading: "Walking route",
-    disclaimer: "Route accessibility has not been verified. Check the place information before travelling.",
     currentLocation: "Use my location",
     locationDenied: "Could not get your location. Enter a starting address instead.",
     startAddress: "Starting address",

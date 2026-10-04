@@ -120,7 +120,6 @@ export const pl = {
 
   route: {
     heading: "Trasa piesza",
-    disclaimer: "Dostępność trasy nie jest zweryfikowana. Sprawdź informacje o miejscu przed podróżą.",
     currentLocation: "Użyj mojej lokalizacji",
     locationDenied: "Nie udało się pobrać lokalizacji. Wpisz adres początku trasy.",
     startAddress: "Adres początku trasy",
